@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".VisualizaUpgradeActivity"
+    tools:showIn="@layout/activity_visualiza_upgrade"
+    android:padding="@dimen/fab_margin">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:id="@+id/tvVisualizaTitulo"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/tvVisualizaSaudacao"
+        android:textColor="#00CCB6"
+        android:textStyle="bold"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="350dp"
+        android:layout_gravity="center"
+        android:id="@+id/ivVisualizaUpgrade"/>
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+
+    <!--
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Voltar"
+        android:id="@+id/bVisualizaUpgradeVoltar"
+        android:textColor="#FFFFFF"
+        android:textAllCaps="false"
+        android:textSize="20dp"
+
+        android:background="@drawable/botaoorganica_customizado"/>
+-->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="6dp"/>
+
+    <Button
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:text="Responder Perguntas"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:layout_gravity="center"
+        android:drawableLeft="@drawable/ic_perguntas2"
+        android:id="@+id/bVisualizaPerguntas"
+        android:textColor="#FFFFFF"
+        android:textAllCaps="false"
+        android:background="@drawable/botaoorganica_customizado"
+        android:textSize="16dp"/>
+
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="6dp"/>
+    <Button
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:text="Histórico de resoluções"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:layout_gravity="center"
+        android:drawableLeft="@drawable/ic_analises"
+        android:id="@+id/bVisualizaHistorico"
+        android:textColor="#FFFFFF"
+        android:textAllCaps="false"
+        android:background="@drawable/botaoorganica_customizado"
+        android:textSize="16dp"/>
+</LinearLayout>

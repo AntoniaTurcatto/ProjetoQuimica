@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="6dp"
+            app:cardUseCompatPadding="true">
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1,4">
+                <TableRow>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:orientation="vertical"
+                        android:layout_span="2">
+                    <!-- IMAGEM PLACEHOLDER -->
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="teste"
+                        android:id="@+id/tvRelatorioPergunta"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="teste2"
+                        android:id="@+id/tvRelatorioEnunciadoPergunta"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="teste3"
+                        android:id="@+id/tvRelatorioConteudoPergunta"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="teste4"
+                        android:id="@+id/tvRelatorioRespostaCorreta"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="teste5"
+                        android:id="@+id/tvRelatorioRepostaEscolhida"/>
+                    </LinearLayout>
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:padding="4dp"
+                        android:id="@+id/ivRelatorioResultado"
+                        android:src="@drawable/ic_acerto"
+                        android:visibility = "visible"/>
+                </TableRow>
+            </TableLayout>
+
+
+
+
+        </android.support.v7.widget.CardView>
+</LinearLayout>

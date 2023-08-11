@@ -1,0 +1,73 @@
+<resources>
+    <string name="app_name">ProjetoQuimica</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_menu">Menu</string>
+    <string name="title_activity_menu_principal">MenuPrincipal</string>
+    <string name="title_activity_resumo">ResumoActivity</string>
+    <string name="title_activity_resumos">ResumosActivity</string>
+    <string name="title_activity_tabela_periodica">TabelaPeriodicaActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_quiz">Relatório de desempenho</string>
+    <string name="title_activity_galeria">GaleriaActivity</string>
+    <string name="title_activity_montar_composto">MontarCompostoActivity</string>
+    <string name="title_activity_pesquisa_elemento">PesquisaElementoActivity</string>
+    <string name="title_activity_teste">TesteActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_cadastro">Cadastro de usuário</string>
+    <string name="title_activity_entrada_de_perguntas">EntradaDePerguntasActivity</string>
+    <array name="opcoesTestePrevio">
+        <item>-- Selecionar --</item>
+        <item>Sim</item>
+        <item>Não</item>
+    </array>
+    <array name="opcoesNivelDificuldade">
+        <item>-- Selecionar --</item>
+        <item>Fácil</item>
+        <item>Médio</item>
+        <item>Difícil</item>
+    </array>
+
+
+    <array name="opcoesRespostaCorreta">
+        <item>--Selecionar--</item>
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
+        <item>D</item>
+        <item>E</item>
+    </array>
+
+
+    <array name="opcoesVestibular">
+        <item>--Selecionar--</item>
+        <item>Sim</item>
+        <item>Não</item>
+    </array>
+
+    <array name="niveisConteudo">
+        <item>--Selecionar--</item>
+        <item>Cobre</item>
+        <item>Bronze</item>
+        <item>Prata</item>
+        <item>Ouro</item>
+        <item>Diamante</item>
+    </array>
+
+    <string name="title_activity_nomes_conteudos">nomesConteudos</string>
+    <string name="title_activity_menu_cadastro_questoes_activy">menuCadastroQuestoesActivy</string>
+    <string name="title_activity_entrada_de_conteudos">EntradaDeConteudosActivity</string>
+    <string name="title_activity_quiz_cadastro">QuizCadastroActivity</string>
+    <string name="title_activity_filtro">Configurações do Quiz</string>
+    <string name="title_activity_tela_teste">TelaTeste</string>
+    <string name="title_activity_visualizacao_niveis">Níveis dos conteúdos</string>
+    <string name="title_activity_filtro_diagnostico">FiltroDiagnosticoActivity</string>
+    <string name="title_activity_diagnostico">DiagnosticoActivity</string>
+    <string name="title_activity_feedback">FeedbackActivity</string>
+    <string name="title_activity_quiz_diagnostico">Quiz</string>
+    <string name="title_activity_visualiza_upgrade">Percurso no conteúdo</string>
+    <string name="title_activity_relatorio">RelatorioActivity</string>
+    <string name="title_activity_visualizacao_detalhadaaqui">VisualizacaoDetalhadaaquiActivity
+    </string>
+    <string name="title_activity_grafico_desempenho_conteudo">GraficoDesempenhoConteudo</string>
+    <string name="title_activity_lista_conteudos">ListaConteudosActivity</string>
+</resources>

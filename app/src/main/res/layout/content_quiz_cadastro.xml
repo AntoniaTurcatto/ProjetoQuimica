@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".QuizCadastroActivity"
+    android:orientation="vertical"
+    tools:showIn="@layout/activity_quiz_cadastro">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cadastro conteúdo"
+                android:id="@+id/bCadastroConteudos"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cadastro pergunta"
+                android:id="@+id/bCadastroPerguntas"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Quiz"
+                android:id="@+id/bQuiz"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Adicionar nivel de conteudo"
+                android:id="@+id/bConteudoNivel"/>
+
+            <Button
+                android:id="@+id/bVisualizarlistaNiveisConteudos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Visualizar lista de niveis conteudos" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Diagnóstico"
+                android:id="@+id/bDiagnostico"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gráficos de Desempenho por Conteúdo"
+                android:id="@+id/bGraficoDesempenhoConteudo"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="10Questionários"
+                android:id="@+id/bGraficoDezQuestionarios"/>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gráfico Niveis Por Conteudo"
+                android:id="@+id/bGraficoNiveisPorConteudo"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
