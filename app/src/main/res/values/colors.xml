@@ -5,4 +5,7 @@
     <color name="colorAccent">#D81B60</color>
     <color name="fundo">#00CCB6</color>
     <color name="fundo2">#F4F3ED</color>
+    <color name="azul">#1555CA</color>
+    <color name="vermelho">#D81B60</color>
+    <color name="verde">#00CCB6</color>
 </resources>

@@ -14,6 +14,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".VisualizaProgressoActivity"
+            android:label="@string/title_activity_visualiza_progresso"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".RelatorioDetalhadoActivity2"
+            android:label="@string/title_activity_relatorio_detalhado2"
+            android:parentActivityName=".RelatorioActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.user.projetoquimica.RelatorioActivity" />
+        </activity>
+        <activity
             android:name=".ListaConteudosActivity"
             android:label="@string/title_activity_lista_conteudos"
             android:parentActivityName=".QuizCadastroActivity"
@@ -40,13 +53,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.user.projetoquimica.QuizCadastroActivity" />
         </activity>
-        <activity android:name=".GraficoNiveisPorConteudoActivity"
+        <activity
+            android:name=".GraficoNiveisPorConteudoActivity"
             android:label="GraficoNiveisPorConteudoActivity"
             android:parentActivityName=".QuizCadastroActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.user.projetoquimica.GraficoNiveisPorConteudoActivity"/>
+                android:value="com.example.user.projetoquimica.GraficoNiveisPorConteudoActivity" />
         </activity>
         <activity
             android:name=".VisualizacaoDetalhadaaquiActivity"
@@ -250,7 +264,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.user.projetoquimica.MenuPrincipalActivity" />
         </activity>
-
     </application>
 
 </manifest>

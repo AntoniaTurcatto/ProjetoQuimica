@@ -88,7 +88,7 @@ public class RelatorioActivity extends AppCompatActivity {
         @Override
         public void onClickPergunta(View view, int position) {
             Pergunta pergunta = listaPerguntas.get(position);
-            Intent it = new Intent(RelatorioActivity.this, VisualizacaoDetalhadaaquiActivity.class);
+            Intent it = new Intent(RelatorioActivity.this, RelatorioDetalhadoActivity2.class);
             it.putExtra("pergunta", pergunta);
             startActivity(it);
             finish();

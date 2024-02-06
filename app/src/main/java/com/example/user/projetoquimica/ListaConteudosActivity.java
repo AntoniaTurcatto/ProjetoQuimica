@@ -10,10 +10,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.user.banco.ConteudoDB;
 import com.example.user.banco.InformacoesApp;
 import com.example.user.classesDominio.Conteudo;
+import com.example.user.classesDominio.NivelConteudo;
 import com.example.user.componente.ListaConteudosAdapter;
 
 import java.util.ArrayList;
@@ -24,6 +26,9 @@ public class ListaConteudosActivity extends AppCompatActivity {
     ConteudoDB conteudoDB = new ConteudoDB(ListaConteudosActivity.this);
     RecyclerView rvListaConteudos;
     ArrayList<Conteudo> lstConteudos;
+
+    NivelConteudo nivelConteudo;
+    TextView tvMostrarQuantidaVidas;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +37,7 @@ public class ListaConteudosActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         rvListaConteudos = findViewById(R.id.rvListaConteudos);
+        tvMostrarQuantidaVidas = findViewById(R.id.tvMostrarQuantidaVidas);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         informacoesApp = (InformacoesApp) getApplicationContext();
@@ -43,6 +49,12 @@ public class ListaConteudosActivity extends AppCompatActivity {
             rvListaConteudos.setLayoutManager(new LinearLayoutManager(ListaConteudosActivity.this));
             rvListaConteudos.setItemAnimator(new DefaultItemAnimator());
             rvListaConteudos.setAdapter(listaConteudosAdapter);
+        }
+        if (nivelConteudo != null){
+            tvMostrarQuantidaVidas.setText(nivelConteudo.getVidas());
+        }
+        else {
+            tvMostrarQuantidaVidas.setText("Nao Peguei as Vidas");
         }
     }
 

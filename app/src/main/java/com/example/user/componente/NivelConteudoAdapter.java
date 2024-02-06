@@ -2,6 +2,7 @@ package com.example.user.componente;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,12 +36,22 @@ public class NivelConteudoAdapter extends RecyclerView.Adapter<NivelConteudoAdap
     @Override
     public void onBindViewHolder(final NivelConteudoAdapter.MyViewHolder holder, final int position) {
         NivelConteudo meuNivelConteudo = listaNivelConteudos.get(position);
+
+        Log.d("TesteVidas", "VidasAdapter: "+meuNivelConteudo.getVidas());
+        Log.d("Adapter","Tentativas Restantes: " + meuNivelConteudo.getTentativas());
+
+
         holder.tvNomeConteudo.setText(meuNivelConteudo.getConteudo().getNomeConteudo());
         //holder.tvNomeNivel.setText("Nível: " + meuNivelConteudo.getNivel().name());
         String nivel = meuNivelConteudo.getNivel().name();
         holder.tvNomeNivel.setText("Nível: " + nivel.substring(0,1).toUpperCase() + nivel.substring(1).toLowerCase()); // enum retorna tudo em maíusculo e quero apenas a primeira letra em caixa alta
         //obter qual o icone do nivel conteudo (img)
         holder.imImagemNivel.setImageDrawable(meuNivelConteudo.getImagemNivelAlternativo(this.context));
+
+
+        holder.tvMostrarQuantidaVidas.setText(meuNivelConteudo.getVidas() + "x");
+        holder.imAtomoVidas.setImageDrawable(meuNivelConteudo.getImagemVidasConteudo(this.context));
+
         //clique no item de conteudo
         if (nivelConteudoOnClickListener != null){
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -58,15 +69,17 @@ public class NivelConteudoAdapter extends RecyclerView.Adapter<NivelConteudoAdap
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        ImageView imImagemNivel;
-        TextView tvNomeConteudo, tvNomeNivel;
+        ImageView imImagemNivel, imAtomoVidas;
+        TextView tvNomeConteudo, tvNomeNivel, tvMostrarQuantidaVidas;
         public MyViewHolder(View itemView) {
             super(itemView);
             tvNomeConteudo = (TextView) itemView.findViewById(R.id.tvNomeConteudo);
 
             imImagemNivel = (ImageView) itemView.findViewById(R.id.imImagemNivel);
-
             tvNomeNivel = (TextView) itemView.findViewById(R.id.tvNomeNivel);
+
+            tvMostrarQuantidaVidas = (TextView) itemView.findViewById(R.id.tvMostrarQuantidaVidas);
+            imAtomoVidas = (ImageView) itemView.findViewById(R.id.imAtomoVidas);
         }
     }
 

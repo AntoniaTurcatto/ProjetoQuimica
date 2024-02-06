@@ -62,7 +62,7 @@ public class QuizActivity extends AppCompatActivity {
     ArrayList<Pergunta> listaPerguntas;
     Context context;
     TextView tvDesempenhoData, tvDesempenhoPontuacaoFinal, tvTituloDesempenho;
-    Button bQuizRelatorio;
+    Button bQuizRelatorio, bQuizProgresso;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +75,7 @@ public class QuizActivity extends AppCompatActivity {
         tvDesempenhoData = findViewById(R.id.tvDesempenhoData);
         tvDesempenhoPontuacaoFinal = findViewById(R.id.tvDesempenhoPontuacaoFinal);
         bQuizRelatorio = findViewById(R.id.bQuizRelatorio);
+        bQuizProgresso = findViewById(R.id.bQuizProgresso);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         informacoesApp = (InformacoesApp) getApplicationContext();
@@ -104,6 +105,7 @@ public class QuizActivity extends AppCompatActivity {
                         + ", Acertos: " + desempenhoConteudo.getQuantidadeAcertos()
                         + ", Erros: " + desempenhoConteudo.getQuantidadeErros()
                         + ", Pontuação: " + desempenhoConteudo.getPontuacaoConteudo(), Toast.LENGTH_LONG).show();
+
                 /*
                 if (desempenhoConteudo.getPontuacaoConteudo() >= 65) {
                     //os parâmetros para criar o objeto
@@ -128,6 +130,14 @@ public class QuizActivity extends AppCompatActivity {
                 startActivity(it);
             }
         });
+        bQuizProgresso.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(QuizActivity.this, VisualizaProgressoActivity.class);
+                it.putExtra("listaConteudo", listaNivelConteudo);
+                startActivity(it);
+            }
+        });
     }
 
     DesempenhoFeedbackAdapter.DesempenhoFeedbackOnClickListener trataCliqueItem = new DesempenhoFeedbackAdapter.DesempenhoFeedbackOnClickListener() {
@@ -141,6 +151,7 @@ public class QuizActivity extends AppCompatActivity {
             startActivity(it);
         }
     };
+
 
 
     @Override

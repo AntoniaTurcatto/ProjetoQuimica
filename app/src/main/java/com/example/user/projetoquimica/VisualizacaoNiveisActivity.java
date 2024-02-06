@@ -18,6 +18,7 @@ import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.user.banco.ConteudoDB;
 import com.example.user.banco.InformacoesApp;
@@ -36,12 +37,14 @@ public class VisualizacaoNiveisActivity extends AppCompatActivity {
     InformacoesApp informacoesApp;
     NivelConteudoDB nivelConteudoDB;
     ArrayList<NivelConteudo> listaNiveisCompleta, listaNivelConteudos;
-    ImageView ivNivelConteudo;
+    ImageView ivNivelConteudo, imAtomoVidas;
+    TextView tvMostrarVidas;
     int tipoDesempenho;
     Context context;
     ConteudoDB conteudoDB;
     ArrayList<Conteudo> listaConteudos;
     Button bVisulizaTudo;
+    NivelConteudo nivelConteudo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,10 @@ public class VisualizacaoNiveisActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         rvNiveis = (RecyclerView) findViewById(R.id.rvNiveis);
         ivNivelConteudo = findViewById(R.id.imImagemNivel);
+
+        imAtomoVidas = findViewById(R.id.imAtomoVidas);
+        tvMostrarVidas = findViewById(R.id.tvMostrarQuantidaVidas);
+
         Intent it = getIntent();
         context = getApplicationContext();
         //obtendo o contexto
@@ -63,6 +70,9 @@ public class VisualizacaoNiveisActivity extends AppCompatActivity {
         listaNivelConteudos = (ArrayList<NivelConteudo>) it.getSerializableExtra("listaNivelConteudos");
         tipoDesempenho = it.getIntExtra("tipoDesempenho", tipoDesempenho);
         bVisulizaTudo = findViewById(R.id.bVisualizaTudo);
+
+
+
         //Adaptar
         if (tipoDesempenho == 2){
             nivelConteudoAdapter = new NivelConteudoAdapter(listaNivelConteudos, trataCliqueItem, context);
@@ -77,6 +87,8 @@ public class VisualizacaoNiveisActivity extends AppCompatActivity {
                 startActivity(it);
             }
         });
+
+        //Carregando Recycle CardView
         rvNiveis.setLayoutManager(new LinearLayoutManager(VisualizacaoNiveisActivity.this));
         rvNiveis.setItemAnimator(new DefaultItemAnimator());
         rvNiveis.setAdapter(nivelConteudoAdapter);

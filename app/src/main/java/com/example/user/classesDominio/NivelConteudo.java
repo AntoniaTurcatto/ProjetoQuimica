@@ -2,6 +2,8 @@ package com.example.user.classesDominio;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.widget.Toast;
@@ -9,6 +11,7 @@ import android.widget.Toast;
 import com.example.user.componente.NivelConteudoEnum;
 import com.example.user.projetoquimica.R;
 
+import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -221,9 +224,20 @@ public class NivelConteudo implements Serializable {
         return drawable;
     }
 
+    public Drawable getImagemVidasConteudo(Context context){
+        Drawable drawable = context.getResources().getDrawable(R.drawable.ic_atomovida5);
 
-
-
+        if (this.vidas == 1){
+            drawable = context.getResources().getDrawable(R.drawable.ic_atomovida1);
+        }else if (this.vidas == 2){
+            drawable = context.getResources().getDrawable(R.drawable.ic_atomovida2);
+        }else if (this.vidas == 3){
+            drawable = context.getResources().getDrawable(R.drawable.ic_atomovida3);
+        }else if (this.vidas == 4){
+            drawable = context.getResources().getDrawable(R.drawable.ic_atomovida4);
+        }
+        return drawable;
+    }
 
     public int getIdNivelConteudo() { return idNivelConteudo; }
 

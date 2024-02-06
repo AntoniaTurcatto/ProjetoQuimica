@@ -2,6 +2,7 @@ package com.example.user.componente;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +51,12 @@ public class DesempenhoFeedbackAdapter extends RecyclerView.Adapter<DesempenhoFe
         // vai mostrar o nível atual
         holder.imImagemNivel.setImageDrawable(meuNivelConteudo.getImagemNivel(this.context));
 
+
+        holder.tvMostrarQuantidaVidas.setText(meuNivelConteudo.getVidas() + "x");
+        holder.imAtomoVidas.setImageDrawable(meuNivelConteudo.getImagemVidasConteudo(this.context));
+
+
+
         //Verificar a quantidade de níveis pulados do feedback
         if (meuFeedback.getNiveisAvancados() > 0) {
             holder.imImagemNivel.setImageDrawable(meuNivelConteudo.getImagemNivelParametro(meuFeedback.getNivelAnterior(), this.context)); // mostrar o anterior para indicar que atualizou! Esse comportamento?
@@ -60,6 +67,9 @@ public class DesempenhoFeedbackAdapter extends RecyclerView.Adapter<DesempenhoFe
         } else {
             holder.imImagemNivel.setImageDrawable(meuNivelConteudo.getImagemNivel(this.context));
         }
+
+        Log.d("TesteVidas", "DesempenhoFeedbackAdapter: "+meuNivelConteudo.getVidas());
+
 
         //clique no item de conteudo
         if (desempenhoFeedbackOnClickListener != null){
@@ -78,14 +88,18 @@ public class DesempenhoFeedbackAdapter extends RecyclerView.Adapter<DesempenhoFe
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        ImageView imImagemNivel, imImagemUpgrade;
-        TextView tvNomeConteudo, tvPontuacaoConteudo;
+        ImageView imImagemNivel, imImagemUpgrade, imAtomoVidas;
+        TextView tvNomeConteudo, tvPontuacaoConteudo, tvMostrarQuantidaVidas;
         public MyViewHolder(View itemView) {
             super(itemView);
             tvNomeConteudo = (TextView) itemView.findViewById(R.id.tvNomeConteudo);
             tvPontuacaoConteudo = (TextView) itemView.findViewById(R.id.tvPontuacaoConteudo);
             imImagemNivel = (ImageView) itemView.findViewById(R.id.imImagemNivel);
             imImagemUpgrade = (ImageView) itemView.findViewById(R.id.imUpgradeNivel);
+
+            tvMostrarQuantidaVidas = (TextView) itemView.findViewById(R.id.tvMostrarQuantidaVidas);
+            imAtomoVidas = (ImageView) itemView.findViewById(R.id.imAtomoVidas);
+
         }
     }
 

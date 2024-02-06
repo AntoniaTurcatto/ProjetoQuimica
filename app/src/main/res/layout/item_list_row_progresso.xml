@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+    
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="6dp"
+        app:cardElevation="8dp"
+        app:cardUseCompatPadding="true">
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end">
+            <TextView
+                android:id="@+id/tvMostrarQuantidaVidas"
+                android:layout_height="wrap_content"
+                android:text="5x"
+                android:textSize="30dp"
+                android:textStyle="bold"
+                android:layout_gravity="bottom"
+                />
+            <ImageView
+                android:id="@+id/imAtomoVidas"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center"
+                tools:srcCompat="@drawable/ic_atomovida5" />
+
+        </GridLayout>
+
+
+        <GridLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:paddingTop="45dp"
+            >
+            <ImageView
+                android:id="@+id/ivImagemConteudo"
+                android:layout_width="57dp"
+                android:layout_height="54dp"
+                android:layout_gravity="end"
+                android:src="@drawable/ic_bronze"
+                android:visibility="visible" />
+            </GridLayout>
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvProgressoNomeConteudo"
+                android:text="NomeConteudo"
+                android:textSize="23dp"
+                android:paddingBottom="7dp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvProgressoTentativas"
+                android:text="Tentativas"
+                android:textSize="15dp"
+                android:paddingBottom="15dp"
+                android:textColor="#000000"
+            />
+
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Texto de Feedback"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:textColor="#000000"
+                />
+
+        </GridLayout>
+
+
+    </android.support.v7.widget.CardView>
+
+
+</LinearLayout>

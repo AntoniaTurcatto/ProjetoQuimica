@@ -1,6 +1,7 @@
 package com.example.user.componente;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -55,8 +56,12 @@ public class RelatorioPerguntaAdapter extends RecyclerView.Adapter<RelatorioPerg
         holder.tvRelatorioRespostaEscolhida.setText("Resposta Escolhida: "+ respostaEscolhida);
         if (respostaCorreta.equals(respostaEscolhida)){
             holder.ivRelatorioResultado.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_acerto));
+            holder.ivRelatorioResultado.setColorFilter(context.getResources().getColor(R.color.verde));
+            holder.tvRelatorioRespostaEscolhida.setTextColor(context.getResources().getColor(R.color.verde));
         } else{
             holder.ivRelatorioResultado.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_erro));
+            holder.ivRelatorioResultado.setColorFilter(context.getResources().getColor(R.color.vermelho));
+            holder.tvRelatorioRespostaEscolhida.setTextColor(context.getResources().getColor(R.color.vermelho));
         }
         /* CUIDADO: .setText() precisa sempre de String. Se for outro tipo de dado, deve ser feita a conversão com o String.valueOf() */
 

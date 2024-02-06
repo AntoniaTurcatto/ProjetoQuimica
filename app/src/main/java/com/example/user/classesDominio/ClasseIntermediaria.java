@@ -125,9 +125,9 @@ public class ClasseIntermediaria {
             // fazendo o controle para saber até onde ele deve ir nas perguntas para esse determinado conteúdo
             int fim = inicio + quantidadePerguntasPorConteudo[indice][0];
             // navegando nas perguntas do conteúdo em questão
-            for (int x = inicio; x < fim; x++) {
+            for (int x = inicio; x < fim ; x++) {
                 // obtendo a pergunta do conteúdo
-                Pergunta minhaPergunta = listaPerguntas.get(x);
+                Pergunta minhaPergunta = listaPerguntas.get(indice);
 
                 // verificando se acertou ou não
                 if (minhaPergunta.getOpcaoEscolhida() == minhaPergunta.getAlternativaCorreta()) {
@@ -218,10 +218,12 @@ public class ClasseIntermediaria {
                         Toast.makeText(context, "Parabéns!!! Você pulou no conteúdo: " + meuNivelConteudo.getConteudo().getNomeConteudo() + " para o nível: " + meuNivelConteudo.getNivel(), Toast.LENGTH_SHORT).show();
                         meuNivelConteudo.setTentativas(0);
                         meuNivelConteudo.setVidas(5);
+                        Log.d("Tentativas","Tentativas Intermediarias: " + meuNivelConteudo.getTentativas());
                     } else if (retorno == 0) {
                         Toast.makeText(context, "Parabéns!!! Você ja completou todos os níveis para o conteúdo: " + meuNivelConteudo.getConteudo().getNomeConteudo() + ". Agora você pode continuar praticando! \n A sua nota foi " + pontuacaoConteudo + ". Será que você consegue se superar?", Toast.LENGTH_SHORT).show();
                         meuNivelConteudo.setTentativas(0);
                         meuNivelConteudo.setVidas(5);
+                        Log.d("TesteVidas", "Completou todos os niveis Vidas: " + meuNivelConteudo.getVidas());
                     }
 
                 } else{ //Pedro - Não obteve três notas acima da média, então ainda não está apto a passar de nível
@@ -235,6 +237,7 @@ public class ClasseIntermediaria {
                 if (meuNivelConteudo.getVidas() > 1){ //Pedro - Ainda não zerou todas as vidas então não decai de nível
                     if (pontuacaoConteudo<=10){ //PEDRO - Número de vidas é decrementado em dois por conta do desempenho menor ou igual a 10
                         meuNivelConteudo.setVidas(meuNivelConteudo.getVidas()-2);
+                        Log.d("TesteVidas", "-2 Vidas: " + meuNivelConteudo.getVidas());
                         System.out.println("Vidas: "+meuNivelConteudo.getVidas());
                         Feedback meuFeedback = new Feedback(meuNivelConteudo.getConteudo(), meuNivelConteudo.getNivel(), meuNivelConteudo.getNivel(), 0);
                         listaFeedbacks.add(meuFeedback);
@@ -242,6 +245,7 @@ public class ClasseIntermediaria {
                     } else{ //Pedro - Número de vidas é decrementado em 1
                         meuNivelConteudo.setVidas(meuNivelConteudo.getVidas()-1);
                         System.out.println("Vidas: "+meuNivelConteudo.getVidas());
+                        Log.d("TesteVidas", "-1 Vidas: " + meuNivelConteudo.getVidas());
                         Feedback meuFeedback = new Feedback(meuNivelConteudo.getConteudo(), meuNivelConteudo.getNivel(), meuNivelConteudo.getNivel(), 0);
                         listaFeedbacks.add(meuFeedback);
                         Toast.makeText(context, "Você tirou abaixo de 65, você perdeu uma vida, você tem mais "+ (meuNivelConteudo.getVidas())+" vidas", Toast.LENGTH_SHORT).show();
@@ -250,7 +254,7 @@ public class ClasseIntermediaria {
                 } else { //PEDRO - Decai um nível direto pois já zerou ou irá zerar o número de vidas
                     meuNivelConteudo.setTentativas(0); //PEDRO - Zera as tentativas pois desceu de nível
                     meuNivelConteudo.setVidas(5); //PEDRO - Restaura o número base vidas (4) pois desceu de nível
-
+                    Log.d("TesteVidas", "Decai nivel Vidas: " + meuNivelConteudo.getVidas());
                     Feedback meuFeedback = new Feedback(meuNivelConteudo.getConteudo(), meuNivelConteudo.getNivel());
                     NivelConteudoEnum novoNivel = meuNivelConteudo.obtemDecaiUmNivel();
                     meuFeedback.setNivelAtual(novoNivel);
@@ -283,6 +287,10 @@ public class ClasseIntermediaria {
             nivelConteudoDB.atualizaVidas(meuNivelConteudo, meuUsuario);
 
             Log.d("Teste", "Nível novo: " + meuNivelConteudo.getNivel());
+
+            Log.d("Tentativas","Tentativas Atualiza: " + meuNivelConteudo.getTentativas());
+
+            Log.d("TesteVidas", "Atualiza Vidas: " + meuNivelConteudo.getVidas());
 
         }
 

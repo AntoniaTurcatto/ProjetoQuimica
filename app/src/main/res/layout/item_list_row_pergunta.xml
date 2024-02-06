@@ -28,40 +28,46 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="teste"
+                        android:textSize="20px"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
                         android:id="@+id/tvRelatorioPergunta"/>
-                    <TextView
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="teste3"
+                            android:textColor="#000000"
+                            android:id="@+id/tvRelatorioConteudoPergunta"/>
+                        <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="teste2"
-                        android:id="@+id/tvRelatorioEnunciadoPergunta"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="teste3"
-                        android:id="@+id/tvRelatorioConteudoPergunta"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="teste4"
-                        android:id="@+id/tvRelatorioRespostaCorreta"/>
+                            android:textColor="#000000"
+                            android:id="@+id/tvRelatorioEnunciadoPergunta"/>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="teste5"
+                        android:textColor="#000000"
                         android:id="@+id/tvRelatorioRepostaEscolhida"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="teste4"
+                            android:textStyle="bold"
+                            android:textColor="#000000"
+                            android:id="@+id/tvRelatorioRespostaCorreta"/>
                     </LinearLayout>
                     <ImageView
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
                         android:padding="4dp"
+                        android:layout_gravity="center"
                         android:id="@+id/ivRelatorioResultado"
                         android:src="@drawable/ic_acerto"
                         android:visibility = "visible"/>
                 </TableRow>
             </TableLayout>
-
-
-
-
         </android.support.v7.widget.CardView>
 </LinearLayout>

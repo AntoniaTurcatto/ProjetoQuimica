@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.ImageButton;
 
 public class MenuPrincipalActivity extends AppCompatActivity{
-    ImageButton ibResumos, ibTabela, ibQuiz, ibGaleria, ibMontar, ibPesquisa;
+    ImageButton ibResumos, ibTabela, ibQuiz, ibGaleria, ibMontar, ibPesquisa, ibProgresso;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,12 +21,17 @@ public class MenuPrincipalActivity extends AppCompatActivity{
         ibQuiz = findViewById(R.id.ibQuiz);
         ibPesquisa = findViewById(R.id.ibPesquisa);
 
+        ibProgresso = findViewById(R.id.ibProgresso);
+
         ibResumos.setOnClickListener(trataEvento);
         ibTabela.setOnClickListener(trataEvento);
         ibPesquisa.setOnClickListener(trataEvento);
         ibMontar.setOnClickListener(trataEvento);
         ibQuiz.setOnClickListener(trataEvento);
         ibGaleria.setOnClickListener(trataEvento);
+
+        ibProgresso.setOnClickListener(trataEvento);
+
     }
 
     View.OnClickListener trataEvento = new View.OnClickListener() {
@@ -51,8 +56,13 @@ public class MenuPrincipalActivity extends AppCompatActivity{
                 Intent itMontar = new Intent(MenuPrincipalActivity.this, MontarCompostoActivity.class);
                 startActivity(itMontar);
             } else if(v.getId() == ibPesquisa.getId()) {
-                Intent itPesquisar = new Intent(MenuPrincipalActivity.this, PesquisaElementoActivity.class);
-                startActivity(itPesquisar);
+                Intent itProgresso = new Intent(MenuPrincipalActivity.this, VisualizaProgressoActivity.class);
+                startActivity(itProgresso);
+            }
+
+            else if (v.getId() == ibProgresso.getId()){
+                Intent itProgresso = new Intent(MenuPrincipalActivity.this, VisualizaProgressoActivity.class);
+                startActivity(itProgresso);
             }
         }
     };

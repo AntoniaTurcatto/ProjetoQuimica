@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,15 +16,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.user.banco.InformacoesApp;
+import com.example.user.banco.NivelConteudoDB;
 import com.example.user.classesDominio.ClasseIntermediaria;
 import com.example.user.classesDominio.Feedback;
 import com.example.user.classesDominio.NivelConteudo;
 
 public class VisualizaUpgradeActivity extends AppCompatActivity {
-    TextView tvVisualizaTitulo, tvVisualizaSaudacao;
-    ImageView ivVisualizaUpgrade;
-    Button bVisualizaUpgradeVoltar, bVisualizaPerguntas, bVisualizaHistorico;
+    TextView tvVisualizaTitulo, tvVisualizaSaudacao, tvMostrarQuantidadeVidas;
+    ImageView ivVisualizaUpgrade, imAtomoVidas;
+    Button bVisualizaUpgradeVoltar, bVisualizaPerguntas, bVisualizaHistorico, bVisualizaProgresso;
     Context context;
+
+    NivelConteudo meuNivel;
 
     InformacoesApp informacoesApp;
     @Override
@@ -34,10 +38,15 @@ public class VisualizaUpgradeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         tvVisualizaTitulo = findViewById(R.id.tvVisualizaTitulo);
         tvVisualizaSaudacao = findViewById(R.id.tvVisualizaSaudacao);
+        tvMostrarQuantidadeVidas = findViewById(R.id.tvMostrarQuantidaVidas);
+        imAtomoVidas = findViewById(R.id.imAtomoVidas);
         ivVisualizaUpgrade = findViewById(R.id.ivVisualizaUpgrade);
         //bVisualizaUpgradeVoltar = findViewById(R.id.bVisualizaUpgradeVoltar);
         bVisualizaPerguntas = findViewById(R.id.bVisualizaPerguntas);
         bVisualizaHistorico = findViewById(R.id.bVisualizaHistorico);
+        bVisualizaProgresso = findViewById(R.id.bVisualizaProgresso);
+
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Intent it = getIntent();
 
@@ -45,10 +54,14 @@ public class VisualizaUpgradeActivity extends AppCompatActivity {
 
         informacoesApp = (InformacoesApp)getApplicationContext();
 
+
         if(it != null){
-            NivelConteudo meuNivel = (NivelConteudo) it.getSerializableExtra("nivel"); //aqui n seria
+            meuNivel = (NivelConteudo) it.getSerializableExtra("nivel"); //aqui n seria
             ivVisualizaUpgrade.setImageDrawable(meuNivel.getImagemNivelCaminho(context));
-            tvVisualizaTitulo.setText(informacoesApp.getMeuUsuario().getNomeUsuario().substring(0,1).toUpperCase() + informacoesApp.getMeuUsuario().getNomeUsuario().substring(1).toLowerCase() + ", confira o seu percurso no conteúdo " + meuNivel.getConteudo().getNomeConteudo() + ":");
+            tvVisualizaTitulo.setText(informacoesApp.getMeuUsuario().getNomeUsuario().substring(0,1).toUpperCase() + informacoesApp.getMeuUsuario().getNomeUsuario().substring(1).toLowerCase() + ", confira o seu percurso, e a quantidade de vidas, no conteúdo " + meuNivel.getConteudo().getNomeConteudo() + ":");
+
+            imAtomoVidas.setImageDrawable(meuNivel.getImagemVidasConteudo(context));
+            tvMostrarQuantidadeVidas.setText(String.valueOf(meuNivel.getVidas()) + "x");
 
             if (it.hasExtra("feedback")) { // sinal que está sendo chamado através da tela de desempenho
                 Feedback meuFeedback = (Feedback) it.getSerializableExtra("feedback");
@@ -58,14 +71,32 @@ public class VisualizaUpgradeActivity extends AppCompatActivity {
                 // desabilitando os botões
                 bVisualizaPerguntas.setVisibility(View.INVISIBLE);
                 bVisualizaHistorico.setVisibility(View.INVISIBLE);
+                bVisualizaHistorico.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent it = new Intent(VisualizaUpgradeActivity.this, RelatorioDetalhadoActivity2.class);
+                        startActivity(it);
+                    }
+                });
             }
+
         }
-        /*bVisualizaUpgradeVoltar.setOnClickListener(new View.OnClickListener() {
+        bVisualizaProgresso.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                finish();
+            public void onClick(View v) {
+                Intent it = new Intent(VisualizaUpgradeActivity.this, VisualizaProgressoActivity.class);
+                it.putExtra("listaConteudo", meuNivel);
+                startActivity(it);
             }
-        });*/
+        });
+
+//        bVisualizaUpgradeVoltar.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                finish();
+//            }
+//
+//        });
     }
 
     @Override

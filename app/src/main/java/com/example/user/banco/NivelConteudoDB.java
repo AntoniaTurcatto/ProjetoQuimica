@@ -44,6 +44,10 @@ public class NivelConteudoDB {
             int idConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getFkConteudoNivel()));
             String nomeConteudo = cursor.getString(cursor.getColumnIndex(Conexao.getNomeConteudo()));
 
+
+            if (vidas == 0){
+                vidas = 5;
+            }
             NivelConteudoEnum nivel = null;
 
             if (nivelBanco == 1) {
@@ -193,7 +197,6 @@ public class NivelConteudoDB {
         ContentValues valores = new ContentValues();
         String where;
         this.bancoDados = this.conexao.getWritableDatabase();
-
         if (meuNivelConteudo.getIdNivelConteudo() != -1) {
             where = Conexao.getIdNivelConteudo() + "=" + meuNivelConteudo.getIdNivelConteudo() + " AND "+ Conexao.getFkUsuarioNivel()+"="+ meuUsuario.getIdUsuario(); //Pedro - Peguntar se isso não deveria estar em todos os lugares
             Log.d("Teste", "Entrei no if de decaiNivel em NivelConteudoDB!");
@@ -237,7 +240,6 @@ public class NivelConteudoDB {
         this.bancoDados = this.conexao.getWritableDatabase();
 
         where = Conexao.getIdNivelConteudo() + "=" + meuNivelConteudo.getIdNivelConteudo();
-
         valores.put(Conexao.getNIVEL(), meuNivelConteudo.getNivel().getValor());
         //update em NivelConteudo
         long resultado = this.bancoDados.update(Conexao.getTabelaNivelConteudo(), valores, where, null);

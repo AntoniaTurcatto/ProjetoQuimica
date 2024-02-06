@@ -70,4 +70,6 @@
     </string>
     <string name="title_activity_grafico_desempenho_conteudo">GraficoDesempenhoConteudo</string>
     <string name="title_activity_lista_conteudos">ListaConteudosActivity</string>
+    <string name="title_activity_relatorio_detalhado2">RelatorioDetalhadoActivity2</string>
+    <string name="title_activity_visualiza_progresso">VisualizaProgressoActivity</string>
 </resources>
