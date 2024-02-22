@@ -49,7 +49,7 @@ public class NivelConteudoAdapter extends RecyclerView.Adapter<NivelConteudoAdap
         holder.imImagemNivel.setImageDrawable(meuNivelConteudo.getImagemNivelAlternativo(this.context));
 
 
-        holder.tvMostrarQuantidaVidas.setText(meuNivelConteudo.getVidas() + "x");
+        holder.tvMostrarQuantidaVidas.setText(String.valueOf(meuNivelConteudo.getVidas()) + "x");
         holder.imAtomoVidas.setImageDrawable(meuNivelConteudo.getImagemVidasConteudo(this.context));
 
         //clique no item de conteudo

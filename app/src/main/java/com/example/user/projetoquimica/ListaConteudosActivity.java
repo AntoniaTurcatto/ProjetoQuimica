@@ -14,9 +14,11 @@ import android.widget.TextView;
 
 import com.example.user.banco.ConteudoDB;
 import com.example.user.banco.InformacoesApp;
+import com.example.user.banco.NivelConteudoDB;
 import com.example.user.classesDominio.Conteudo;
 import com.example.user.classesDominio.NivelConteudo;
 import com.example.user.componente.ListaConteudosAdapter;
+import com.example.user.componente.ProgressoAdapter;
 
 import java.util.ArrayList;
 
@@ -27,7 +29,6 @@ public class ListaConteudosActivity extends AppCompatActivity {
     RecyclerView rvListaConteudos;
     ArrayList<Conteudo> lstConteudos;
 
-    NivelConteudo nivelConteudo;
     TextView tvMostrarQuantidaVidas;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +51,7 @@ public class ListaConteudosActivity extends AppCompatActivity {
             rvListaConteudos.setItemAnimator(new DefaultItemAnimator());
             rvListaConteudos.setAdapter(listaConteudosAdapter);
         }
-        if (nivelConteudo != null){
-            tvMostrarQuantidaVidas.setText(nivelConteudo.getVidas());
-        }
-        else {
-            tvMostrarQuantidaVidas.setText("Nao Peguei as Vidas");
-        }
+
     }
 
     ListaConteudosAdapter.ConteudoOnClickListener trataCliqueItem = new ListaConteudosAdapter.ConteudoOnClickListener() {

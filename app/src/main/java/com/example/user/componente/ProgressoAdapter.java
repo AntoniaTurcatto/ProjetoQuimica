@@ -12,8 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.user.banco.InformacoesApp;
+import com.example.user.banco.NivelConteudoDB;
 import com.example.user.classesDominio.NivelConteudo;
+import com.example.user.projetoquimica.ListaConteudosActivity;
 import com.example.user.projetoquimica.R;
 
 import java.util.ArrayList;
@@ -26,7 +30,7 @@ public class ProgressoAdapter extends RecyclerView.Adapter<ProgressoAdapter.MyVi
     private Context context;
 
 
-    public ProgressoAdapter(ArrayList<NivelConteudo> listaProgresso, ProgressoOnClickListener progressoOnClickListener) {
+    public ProgressoAdapter(ArrayList<NivelConteudo> listaProgresso, ProgressoOnClickListener progressoOnClickListener, Context context) {
         this.listaProgresso = listaProgresso;
         this.progressoOnClickListener = progressoOnClickListener;
         this.context = context;
@@ -43,11 +47,13 @@ public class ProgressoAdapter extends RecyclerView.Adapter<ProgressoAdapter.MyVi
     @Override
     public void onBindViewHolder(final ProgressoAdapter.MyViewHolder holder, final int position) {
         NivelConteudo nivelConteudo = listaProgresso.get(position);
+
+
         holder.tvProgressoNomeConteudo.setText(nivelConteudo.getConteudo().getNomeConteudo());
         holder.tvTentativas.setText("Numero de Tentativas Restante: "+ String.valueOf(nivelConteudo.getTentativas()));
 
-        holder.tvMostrarQuantidaVidas.setText(nivelConteudo.getVidas() + "x");
-        holder.imAtomoVidas.setImageDrawable(nivelConteudo.getImagemVidasConteudo(this.context));
+        holder.tvMostrarQuantidadeVidasProgresso.setText(String.valueOf(nivelConteudo.getVidas()) + "x");
+        holder.imAtomoVidasProgresso.setImageDrawable(nivelConteudo.getImagemVidasConteudo(this.context));
 
 
         Log.d("Tentativas","Tentativas Adapter: " + nivelConteudo.getTentativas());
@@ -71,16 +77,16 @@ public class ProgressoAdapter extends RecyclerView.Adapter<ProgressoAdapter.MyVi
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTentativas, tvProgressoNomeConteudo, tvMostrarQuantidaVidas;
-        ImageView imAtomoVidas;
+        TextView tvTentativas, tvProgressoNomeConteudo, tvMostrarQuantidadeVidasProgresso;
+        ImageView imAtomoVidasProgresso;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             tvTentativas = (TextView) itemView.findViewById(R.id.tvProgressoTentativas);
             tvProgressoNomeConteudo = (TextView) itemView.findViewById(R.id.tvProgressoNomeConteudo);
-//
-//            tvMostrarQuantidaVidas = (TextView) itemView.findViewById(R.id.tvMostrarQuantidaVidas);
-//            imAtomoVidas = (ImageView) itemView.findViewById(R.id.imAtomoVidas);
+
+            tvMostrarQuantidadeVidasProgresso = (TextView) itemView.findViewById(R.id.tvMostrarQuantidadeVidasProgresso);
+            imAtomoVidasProgresso = (ImageView) itemView.findViewById(R.id.imAtomoVidasProgresso);
         }
     }
 

@@ -8,8 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.user.banco.NivelConteudoDB;
 import com.example.user.classesDominio.Conteudo;
 import com.example.user.classesDominio.Pergunta;
+import com.example.user.projetoquimica.ListaConteudosActivity;
 import com.example.user.projetoquimica.R;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 public class ListaConteudosAdapter extends RecyclerView.Adapter<ListaConteudosAdapter.MyViewHolder> {
     private ArrayList<Conteudo> lstConteudos;
     private ConteudoOnClickListener conteudoOnClickListener;
+
 
 
     public ListaConteudosAdapter(ArrayList<Conteudo> lstConteudos,ConteudoOnClickListener conteudoOnClickListener) {

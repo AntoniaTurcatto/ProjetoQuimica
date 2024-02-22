@@ -21,7 +21,6 @@ public class MenuPrincipalActivity extends AppCompatActivity{
         ibQuiz = findViewById(R.id.ibQuiz);
         ibPesquisa = findViewById(R.id.ibPesquisa);
 
-        ibProgresso = findViewById(R.id.ibProgresso);
 
         ibResumos.setOnClickListener(trataEvento);
         ibTabela.setOnClickListener(trataEvento);
@@ -30,7 +29,6 @@ public class MenuPrincipalActivity extends AppCompatActivity{
         ibQuiz.setOnClickListener(trataEvento);
         ibGaleria.setOnClickListener(trataEvento);
 
-        ibProgresso.setOnClickListener(trataEvento);
 
     }
 
@@ -56,14 +54,10 @@ public class MenuPrincipalActivity extends AppCompatActivity{
                 Intent itMontar = new Intent(MenuPrincipalActivity.this, MontarCompostoActivity.class);
                 startActivity(itMontar);
             } else if(v.getId() == ibPesquisa.getId()) {
-                Intent itProgresso = new Intent(MenuPrincipalActivity.this, VisualizaProgressoActivity.class);
+                Intent itProgresso = new Intent(MenuPrincipalActivity.this, PesquisaElementoActivity.class);
                 startActivity(itProgresso);
             }
 
-            else if (v.getId() == ibProgresso.getId()){
-                Intent itProgresso = new Intent(MenuPrincipalActivity.this, VisualizaProgressoActivity.class);
-                startActivity(itProgresso);
-            }
         }
     };
 }

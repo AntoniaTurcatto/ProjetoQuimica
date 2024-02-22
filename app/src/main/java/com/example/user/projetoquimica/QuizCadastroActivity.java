@@ -14,7 +14,7 @@ import com.example.user.componente.ListaConteudosAdapter;
 public class QuizCadastroActivity extends AppCompatActivity {
 
     Button bCadastroPerguntas, bCadastroConteudos, bQuiz, bConteudoNivel, bVisualizarNiveisConteudos,
-    bDiagnostico, bGraficoDesempenhoConteudo, bGraficoDezQuestionarios, bGraficoNiveisPorConteudo;
+    bDiagnostico, bGraficoDesempenhoConteudo, bGraficoDezQuestionarios, bGraficoNiveisPorConteudo, bProgresso;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +32,8 @@ public class QuizCadastroActivity extends AppCompatActivity {
         bGraficoDesempenhoConteudo = findViewById(R.id.bGraficoDesempenhoConteudo);
         bGraficoDezQuestionarios = findViewById(R.id.bGraficoDezQuestionarios);
         bGraficoNiveisPorConteudo = findViewById(R.id.bGraficoNiveisPorConteudo);
+        bProgresso = findViewById(R.id.bProgresso);
+
 
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -105,6 +107,14 @@ public class QuizCadastroActivity extends AppCompatActivity {
                 startActivity(it);
             }
         });
+        bProgresso.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(QuizCadastroActivity.this, VisualizaProgressoActivity.class);
+                startActivity(it);
+            }
+        });
+
 
     }
 

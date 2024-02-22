@@ -50,7 +50,7 @@ public class VisualizaProgressoActivity extends AppCompatActivity {
             listaNivelConteudo = nivelConteudoDB.carregaListaCompleta(informacoesApp.getMeuUsuario(), informacoesApp.getTipoConteudo());
         }
 
-        progressoAdapter = new ProgressoAdapter(listaNivelConteudo, trataCliqueItem);
+        progressoAdapter = new ProgressoAdapter(listaNivelConteudo, trataCliqueItem, VisualizaProgressoActivity.this);
         rvProgresso.setLayoutManager(new LinearLayoutManager(VisualizaProgressoActivity.this));
         rvProgresso.setItemAnimator(new DefaultItemAnimator());
         rvProgresso.setAdapter(progressoAdapter);

@@ -71,6 +71,14 @@
                 android:layout_height="wrap_content"
                 android:text="Gráfico Niveis Por Conteudo"
                 android:id="@+id/bGraficoNiveisPorConteudo"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Progresso"
+                android:id="@+id/bProgresso"
+                />
+<!--     Seria mais uma listagem de Vidas e tentativas anteriores-->
+
 
         </LinearLayout>
 

@@ -5,10 +5,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
-    
+
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="160dp"
         app:cardCornerRadius="6dp"
         app:cardElevation="8dp"
         app:cardUseCompatPadding="true">
@@ -17,16 +17,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end">
+
             <TextView
-                android:id="@+id/tvMostrarQuantidaVidas"
+                android:id="@+id/tvMostrarQuantidadeVidasProgresso"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:text="5x"
-                android:textSize="30dp"
-                android:textStyle="bold"
-                android:layout_gravity="bottom"
-                />
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
             <ImageView
-                android:id="@+id/imAtomoVidas"
+                android:id="@+id/imAtomoVidasProgresso"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
                 android:layout_gravity="center"
@@ -36,11 +37,11 @@
 
 
         <GridLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:paddingTop="45dp"
-            >
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:paddingTop="55dp">
+
             <ImageView
                 android:id="@+id/ivImagemConteudo"
                 android:layout_width="57dp"
@@ -48,7 +49,7 @@
                 android:layout_gravity="end"
                 android:src="@drawable/ic_bronze"
                 android:visibility="visible" />
-            </GridLayout>
+        </GridLayout>
 
         <GridLayout
             android:layout_width="match_parent"
@@ -56,36 +57,34 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvProgressoNomeConteudo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvProgressoNomeConteudo"
-                android:text="NomeConteudo"
-                android:textSize="23dp"
                 android:paddingBottom="7dp"
-                android:textStyle="bold"
+                android:text="NomeConteudo"
                 android:textColor="#000000"
-                />
+                android:textSize="23dp"
+                android:textStyle="bold" />
+
             <TextView
+                android:id="@+id/tvProgressoTentativas"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvProgressoTentativas"
-                android:text="Tentativas"
-                android:textSize="15dp"
                 android:paddingBottom="15dp"
+                android:text="Tentativas"
                 android:textColor="#000000"
-            />
-
+                android:textSize="15dp" />
 
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Texto de Feedback"
-                android:textSize="15dp"
-                android:textStyle="bold"
+                android:paddingTop="30dp"
                 android:gravity="center"
+                android:text="Texto de Feedback"
                 android:textColor="#000000"
-                />
+                android:textSize="15dp"
+                android:textStyle="bold" />
 
         </GridLayout>
 
