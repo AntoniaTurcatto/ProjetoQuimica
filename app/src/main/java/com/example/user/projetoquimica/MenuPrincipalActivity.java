@@ -5,9 +5,16 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.example.user.banco.InformacoesApp;
 
 public class MenuPrincipalActivity extends AppCompatActivity{
     ImageButton ibResumos, ibTabela, ibQuiz, ibGaleria, ibMontar, ibPesquisa, ibProgresso;
+    InformacoesApp informacoesApp;
+    TextView tvTipoMenuPrincipal;
+    ImageView ivTipoMenuPrincipal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +28,11 @@ public class MenuPrincipalActivity extends AppCompatActivity{
         ibQuiz = findViewById(R.id.ibQuiz);
         ibPesquisa = findViewById(R.id.ibPesquisa);
 
+        tvTipoMenuPrincipal = findViewById(R.id.tvTipoMenuPrincipal);
+
+        ivTipoMenuPrincipal = findViewById(R.id.ivTipoMenuPrincipal);
+
+        informacoesApp = (InformacoesApp)getApplicationContext();
 
         ibResumos.setOnClickListener(trataEvento);
         ibTabela.setOnClickListener(trataEvento);
@@ -29,8 +41,18 @@ public class MenuPrincipalActivity extends AppCompatActivity{
         ibQuiz.setOnClickListener(trataEvento);
         ibGaleria.setOnClickListener(trataEvento);
 
-
+        //organica
+        if(informacoesApp.getTipoConteudo() == 1){
+            tvTipoMenuPrincipal.setText("Química Orgânica");
+            ivTipoMenuPrincipal.setImageResource(R.mipmap.organica);
+            //img.setImageResource(R.mipmap.ic_launcher);
+        } else { // inorganica
+            tvTipoMenuPrincipal.setText("Química Inorgânica");
+            ivTipoMenuPrincipal.setImageResource(R.mipmap.inorganica);
+        }
     }
+
+
 
     View.OnClickListener trataEvento = new View.OnClickListener() {
         @Override

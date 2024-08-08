@@ -10,12 +10,6 @@
     tools:showIn="@layout/activity_tela_teste">
 
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/cancel"
-        android:id="@+id/imImagemTeste"/>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

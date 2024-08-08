@@ -91,7 +91,7 @@ public class NivelConteudoDB {
                 int vidas = cursor.getInt(cursor.getColumnIndex(Conexao.getVIDAS()));
                 NivelConteudoEnum nivel = null; //PEDRO - provisório
 
-                if (nivelBanco == 0) {
+                if (nivelBanco == 1) {
                     nivel = NivelConteudoEnum.COBRE;
                 } else if (nivelBanco == 2) {
                     nivel = NivelConteudoEnum.BRONZE;
@@ -131,7 +131,7 @@ public class NivelConteudoDB {
             int vidas = cursor.getInt(cursor.getColumnIndex(Conexao.getVIDAS()));
             NivelConteudoEnum nivel = null;
 
-            if (nivelBanco == 0) {
+            if (nivelBanco == 1) {
                 nivel = NivelConteudoEnum.COBRE;
             } else if (nivelBanco == 2) {
                 nivel = NivelConteudoEnum.BRONZE;

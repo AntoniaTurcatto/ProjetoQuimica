@@ -71,9 +71,27 @@
 
         android:background="@drawable/botaoorganica_customizado"/>
 -->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Você está no nível:"
+        android:textAlignment="center"
+        android:textSize="18sp"/>
+
+    <TextView
+        android:id="@+id/tvNivelConteudoVisualizaUpgradeActivity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="NÍVEL"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:textColor="#000" />
+
     <Space
         android:layout_width="match_parent"
-        android:layout_height="6dp"/>
+        android:layout_height="16dp"/>
+
     <Button
         android:layout_width="270dp"
         android:layout_height="wrap_content"

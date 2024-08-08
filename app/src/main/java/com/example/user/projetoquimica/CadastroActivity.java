@@ -46,7 +46,7 @@ public class CadastroActivity extends AppCompatActivity{
                         if (!etEmail.getText().toString().equals("")){
                             if (!etNomeUsuario.getText().toString().equals("")){
                                 if (!etSenha.getText().toString().equals("")){
-
+                                    //cadastro bem sucedido
                                     String nomeCompleto = etNomeCompleto.getText().toString();
                                     long cpf = Long.parseLong(etCpf.getText().toString());
                                     String email = etEmail.getText().toString();

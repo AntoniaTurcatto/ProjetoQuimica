@@ -9,9 +9,13 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
+import com.example.user.banco.InformacoesApp;
 import com.example.user.classesDominio.Pergunta;
 import com.example.user.componente.RelatorioPerguntaAdapter;
 import com.github.mikephil.charting.charts.PieChart;
@@ -28,6 +32,7 @@ public class RelatorioActivity extends AppCompatActivity {
     PieChart pcRelatorioResultados;
     ArrayList<Pergunta> listaPerguntas = new ArrayList<>();
     RelatorioPerguntaAdapter adapter;
+    InformacoesApp informacoesApp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +40,13 @@ public class RelatorioActivity extends AppCompatActivity {
         setContentView(R.layout.activity_relatorio);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         //RecyclerView
         rvRelatorioVisualizaPerguntas = findViewById(R.id.rvRelatorioVisualizaPerguntas);
         //PieChart
         pcRelatorioResultados = findViewById(R.id.pcRelatorioResultados);
+        informacoesApp = (InformacoesApp)getApplicationContext();
 
         Intent it = getIntent();
 
@@ -52,6 +59,52 @@ public class RelatorioActivity extends AppCompatActivity {
             rvRelatorioVisualizaPerguntas.setItemAnimator(new DefaultItemAnimator());
             rvRelatorioVisualizaPerguntas.setAdapter(adapter);
         }
+
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_info, menu);
+        //QUIMICA ORGANICA
+        if(informacoesApp.getTipoConteudo() == 1){
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.organica);
+        } else {
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.inorganica);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.iv_organica_ou_inorganica){
+            //tipo de quimica (inorganica ou organica) por escrito
+            String tipoQuimica;
+            //QUIMICA ORGANICA
+            if(informacoesApp.getTipoConteudo() == 1){
+                tipoQuimica = "Organica";
+
+            } else {
+                //QUIMICA INORGANICA
+                tipoQuimica = "Inorganica";
+            }
+            Toast.makeText(informacoesApp, "Você está no modo Química "+ tipoQuimica + "\nCaso deseja trocar volte ao menu de escolha de modo (organica ou inorganica)", Toast.LENGTH_SHORT).show();
+        }
+
+        if(id == R.id.action_informacoes){
+            Toast.makeText(informacoesApp, "Clicou no item de settings", Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
     }
 
     public void ConfiguraGrafico (ArrayList<Pergunta> listaPerguntas){

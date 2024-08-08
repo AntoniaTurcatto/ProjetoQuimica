@@ -29,7 +29,7 @@ public class Pergunta implements Serializable {
         this.opcaoD = opcaoD;
         this.opcaoE = opcaoE;
         this.imagem = imagem;
-        this.testePrevio = testePrevio;
+        this.testePrevio = testePrevio; //1 = sim | 0 = não
         this.conteudo = conteudo;
         this.alternativaCorreta = alternativaCorreta;
         this.opcaoEscolhida = opcaoEscolhida;

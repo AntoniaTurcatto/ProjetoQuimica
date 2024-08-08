@@ -46,6 +46,7 @@ public class TelaTeste extends AppCompatActivity {
         nivelConteudoDB = new NivelConteudoDB(getApplicationContext());
         listaConteudos = conteudoDB.buscaConteudos(informacoesApp.getTipoConteudo());
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         String[] nomesConteudos = new String[(listaConteudos.size()) + 1];
         nomesConteudos[0] = "<<Selecionar>>";

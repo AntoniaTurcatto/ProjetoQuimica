@@ -5,12 +5,15 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.user.banco.Conexao;
+import com.example.user.banco.DesempenhoConteudoDB;
 import com.example.user.banco.NivelConteudoDB;
 import com.example.user.banco.PerguntaDB;
 import com.example.user.componente.NivelConteudoEnum;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ClasseIntermediaria {
     Context context;
@@ -20,7 +23,7 @@ public class ClasseIntermediaria {
         this.context = context;
     }
 
-    public ArrayList<Pergunta> carregaQuantPerguntasPorConteudo(ArrayList<NivelConteudo> listaNivelConteudos, int[][] quantidadePerguntasPorConteudo) {
+    public ArrayList<Pergunta> carregaQuantPerguntasPorConteudo(ArrayList<NivelConteudo> listaNivelConteudos, int[][] quantidadePerguntasPorConteudo, int testePrevio) {
         ArrayList<Pergunta> listaPerguntas;
 
         for (int x = 0; x < listaNivelConteudos.size(); x++) {
@@ -56,7 +59,14 @@ public class ClasseIntermediaria {
             Log.d("Teste", "Conteudo: " + x + "-" + listaNivelConteudos.get(x).getConteudo().getNomeConteudo() + ": Total " + quantidadePerguntasPorConteudo[x][0] + ", faceis " + quantidadePerguntasPorConteudo[x][1] + ", médias " + quantidadePerguntasPorConteudo[x][2] + ", dificeis " + quantidadePerguntasPorConteudo[x][3]);
         }
         PerguntaDB perguntaDB = new PerguntaDB(this.context);
-        listaPerguntas = perguntaDB.buscaPerguntasPorConteudosUnionAll(listaNivelConteudos, quantidadePerguntasPorConteudo);
+        //listaPerguntas = perguntaDB.buscaPerguntasPorConteudosUnionAll(listaNivelConteudos, quantidadePerguntasPorConteudo);
+
+        if (testePrevio == 0){// sem teste previo
+            listaPerguntas = perguntaDB.buscaPerguntasPorConteudosUnionAll(listaNivelConteudos, quantidadePerguntasPorConteudo);
+        } else { // com teste previo
+            listaPerguntas = perguntaDB.buscaPerguntasPorConteudosUnionAllComTestePrevio(listaNivelConteudos, quantidadePerguntasPorConteudo);
+        }
+
         return listaPerguntas;
     }
 
@@ -306,7 +316,7 @@ public class ClasseIntermediaria {
         return desempenhoQuestionario;
     }
 
-    public ArrayList<Pergunta> carregaQuantPerguntasPorConteudoDiagnostico(ArrayList<NivelConteudo> listaNivelConteudos, int[][] quantidadePerguntasPorConteudo) {
+    public ArrayList<Pergunta> carregaQuantPerguntasPorConteudoDiagnostico(ArrayList<NivelConteudo> listaNivelConteudos, int[][] quantidadePerguntasPorConteudo, int testePrevio) {
         ArrayList<Pergunta> listaPerguntas;
 
         for (int x = 0; x < listaNivelConteudos.size(); x++) {
@@ -343,9 +353,17 @@ public class ClasseIntermediaria {
             Log.d("Teste", "Conteudo: " + x + "-" + listaNivelConteudos.get(x).getConteudo().getNomeConteudo() + ": Total " + quantidadePerguntasPorConteudo[x][0] + ", faceis " + quantidadePerguntasPorConteudo[x][1] + ", médias " + quantidadePerguntasPorConteudo[x][2] + ", dificeis " + quantidadePerguntasPorConteudo[x][3]);
         }
         PerguntaDB perguntaDB = new PerguntaDB(this.context);
-        listaPerguntas = perguntaDB.buscaPerguntasPorConteudosUnionAll(listaNivelConteudos, quantidadePerguntasPorConteudo);
+        //listaPerguntas = perguntaDB.buscaPerguntasPorConteudosUnionAll(listaNivelConteudos, quantidadePerguntasPorConteudo);
+
+        if (testePrevio == 0){// sem teste previo
+            listaPerguntas = perguntaDB.buscaPerguntasPorConteudosUnionAll(listaNivelConteudos, quantidadePerguntasPorConteudo);
+        } else { // com teste previo
+            listaPerguntas = perguntaDB.buscaPerguntasPorConteudosUnionAllComTestePrevio(listaNivelConteudos, quantidadePerguntasPorConteudo);
+        }
+
         return listaPerguntas;
     }
+
 
     public DesempenhoQuestionario calculaDesempenhoDiagnostico(ArrayList<NivelConteudo> listaNivelConteudos, int[][] quantidadePerguntasPorConteudo, ArrayList<Pergunta> listaPerguntas, Usuario meuUsuario, ArrayList<Feedback> listaFeedbacks) {
         int acertos = 0;
@@ -471,5 +489,37 @@ public class ClasseIntermediaria {
         }
 
         return desempenhoQuestionario;
+    }
+
+    public ArrayList<String> criaVariasExplicacoesFeedback(Usuario usuario, ArrayList<Conteudo> listaConteudos){
+        //LOGICA DA EXPLICAÇÃO:======================================================================================
+        //coisas necessárias:
+        /*
+        ranking atual .................................................................................(int para identificar)
+        ranking anterior (detectar progresso ou regresso)..............................................(int para identificar)
+        taxa de acerto dos últimos 5 questionários (média) (ou menos caso não tenham suficientem)......(float (0.0 a 1.0))
+        taxa de acerto último questionário.............................................................(float (0.0 a 1.0))
+        */
+        NivelConteudoDB nivelConteudoDB = new NivelConteudoDB(context);
+        DesempenhoConteudoDB desempenhoConteudoDB = new DesempenhoConteudoDB(context);
+        ArrayList<String> listaExplicacoes = new ArrayList<>();
+
+        ArrayList<NivelConteudo> listaNivelConteudo = nivelConteudoDB.buscaConteudosComNivel(listaConteudos, usuario);
+
+        for (int i = 0; i < listaConteudos.size(); i++){
+            int rankingAtual;
+            int rankingAnterior;
+            float taxaDeAcertosUltimosCinco;
+            float taxaDeAcertosUltimo;
+
+            //calculando o ranking atual e anterior
+            rankingAtual = listaNivelConteudo.get(i).getNivel().getValor();
+            rankingAnterior = listaNivelConteudo.get(i).getNivelAnterior().getValor();
+        }
+        return
+    }
+
+    public ArrayList<NivelConteudo> carregaListaDeNivelConteudoComConteudo(ArrayList<Conteudo> listaConteudos, Usuario usuario){
+        return new NivelConteudoDB(context).buscaConteudosComNivel(listaConteudos, usuario);
     }
 }

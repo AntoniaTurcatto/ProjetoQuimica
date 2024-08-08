@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -22,7 +22,6 @@ import com.example.user.banco.InformacoesApp;
 import com.example.user.banco.NivelConteudoDB;
 import com.example.user.classesDominio.ClasseIntermediaria;
 import com.example.user.classesDominio.Conteudo;
-import com.example.user.classesDominio.DesempenhoConteudo;
 import com.example.user.classesDominio.DesempenhoQuestionario;
 import com.example.user.classesDominio.Feedback;
 import com.example.user.classesDominio.NivelConteudo;
@@ -41,6 +40,7 @@ public class QuizDiagnosticoActivity extends AppCompatActivity {
     ArrayList<Conteudo> listaConteudos;
     ArrayList<NivelConteudo> listaNivelConteudos;
     int quantidade; // quantidade de perguntas por conteúdo -> informação que vem da tela anterior
+    int testePrevio; //se terá perguntas de teste prévio -> informação que vem da tela anterior
     NivelConteudoDB nivelConteudoDB;
     RadioGroup rgAlternativa;
     ImageView ivImagemPergunta;
@@ -62,7 +62,9 @@ public class QuizDiagnosticoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_quiz_diagnostico);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
 
         tvPergunta = findViewById(R.id.tvPergunta);
         rbOpcaoA = findViewById(R.id.rbOpcaoA);
@@ -88,6 +90,8 @@ public class QuizDiagnosticoActivity extends AppCompatActivity {
             listaConteudos = (ArrayList<Conteudo>)it.getSerializableExtra("listaConteudos");
             tipo = it.getIntExtra("tipo",0);
             quantidade = it.getIntExtra("quantidade",0);
+            testePrevio = it.getIntExtra("testePrevio",0);
+            Log.d("AAAAAAAAAAAAAAAAAAA", String.valueOf(quantidade));
         }
 
         nivelConteudoDB = new NivelConteudoDB(getApplicationContext());
@@ -109,9 +113,9 @@ public class QuizDiagnosticoActivity extends AppCompatActivity {
         }
         classeIntermediaria = new ClasseIntermediaria(getApplicationContext());
         if (tipo == 1) {
-            listaPerguntas = classeIntermediaria.carregaQuantPerguntasPorConteudo(listaNivelConteudos, quantidadePerguntasPorConteudo);
+            listaPerguntas = classeIntermediaria.carregaQuantPerguntasPorConteudo(listaNivelConteudos, quantidadePerguntasPorConteudo, testePrevio);
         } else if (tipo == 2) {
-            listaPerguntas = classeIntermediaria.carregaQuantPerguntasPorConteudoDiagnostico(listaNivelConteudos, quantidadePerguntasPorConteudo);
+            listaPerguntas = classeIntermediaria.carregaQuantPerguntasPorConteudoDiagnostico(listaNivelConteudos, quantidadePerguntasPorConteudo, testePrevio);
         }
 
 
@@ -120,6 +124,7 @@ public class QuizDiagnosticoActivity extends AppCompatActivity {
             carregaPergunta();
         }
 
+        Log.d("Conteudo", "conteudo");
         bProximo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -213,6 +218,14 @@ public class QuizDiagnosticoActivity extends AppCompatActivity {
                     }
 
                 }
+            }
+        });
+
+//VOLTAR A TELA ANTERIOR
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
 
@@ -330,5 +343,42 @@ public class QuizDiagnosticoActivity extends AppCompatActivity {
             respondeuTodas = true;
         }
         return respondeuTodas;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_info, menu);
+        //QUIMICA ORGANICA
+        if(informacoesApp.getTipoConteudo() == 1){
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.organica);
+        } else {
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.inorganica);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.iv_organica_ou_inorganica){
+            //tipo de quimica (inorganica ou organica) por escrito
+            String tipoQuimica;
+            //QUIMICA ORGANICA
+            if(informacoesApp.getTipoConteudo() == 1){
+                tipoQuimica = "Organica";
+
+            } else {
+                //QUIMICA INORGANICA
+                tipoQuimica = "Inorganica";
+            }
+            Toast.makeText(informacoesApp, "Você está no modo Química "+ tipoQuimica + "\nCaso deseja trocar volte ao menu de escolha de modo (organica ou inorganica)", Toast.LENGTH_SHORT).show();
+        }
+
+        if(id == R.id.action_informacoes){
+            Toast.makeText(informacoesApp, "Clicou no item de settings", Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
     }
 }

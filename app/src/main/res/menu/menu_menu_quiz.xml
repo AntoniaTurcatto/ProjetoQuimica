@@ -1,4 +1,39 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.user.projetoquimica.SplashScreenActivity">
 
+    <item
+        android:id="@+id/iv_organica_ou_inorganica"
+        android:orderInCategory="200"
+        android:title="Química orgânica ou inorgânica"
+        app:showAsAction="always"
+        android:icon="@mipmap/inorganica"/>
+
+    <item
+        android:id="@+id/cadastroConteudo"
+        android:orderInCategory="300"
+        android:title="Cadastro de conteudo"/>
+
+    <item
+        android:id="@+id/cadastroPergunta"
+        android:orderInCategory="300"
+        android:title="Cadastro de pergunta"/>
+
+    <item
+        android:id="@+id/adicionarNivelConteudo"
+        android:orderInCategory="300"
+        android:title="Adicionar Nivel de Conteudo"/>
+
+    <item
+        android:id="@+id/dezQuesionarios"
+        android:orderInCategory="300"
+        android:title="Dez Questionarios Gráfico"/>
+
+    <item
+        android:id="@+id/progresso"
+        android:orderInCategory="300"
+        android:title="Progresso"/>
+
+    <!-- @android:drawable/ic_dialog_info -->
 </menu>

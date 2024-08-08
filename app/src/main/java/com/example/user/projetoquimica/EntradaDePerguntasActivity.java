@@ -16,6 +16,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -54,7 +56,7 @@ public class EntradaDePerguntasActivity extends AppCompatActivity {
         setContentView(R.layout.activity_entrada_de_perguntas);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         bSalvar = findViewById(R.id.bSalvar);
@@ -95,6 +97,14 @@ public class EntradaDePerguntasActivity extends AppCompatActivity {
             nomesConteudos[x+1] = umConteudo.getNomeConteudo();
         }
 
+        //VOLTAR A TELA ANTERIOR
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
 
         spConteudos.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,nomesConteudos));
 
@@ -133,7 +143,14 @@ public class EntradaDePerguntasActivity extends AppCompatActivity {
                                                         String opcaoE = etOpcaoE.getText().toString();
                                                         int indice = spConteudos.getSelectedItemPosition();
                                                         Conteudo meuConteudo = listaConteudos.get(indice-1);
-                                                        int testePrevio = spTestePrevio.getSelectedItemPosition();
+                                                        int testePrevioSpinnerPosition = spTestePrevio.getSelectedItemPosition();
+                                                        int testePrevio = 0;
+                                                        if (testePrevioSpinnerPosition != 0){ // não
+                                                            if (testePrevioSpinnerPosition == 1){
+                                                                testePrevio = 1; //SIM
+                                                            }
+                                                        }
+
                                                         byte[] imagem = null;
                                                         //if (imageView != null) {
                                                         //    imagem = imageViewToByte(imageView);
@@ -261,6 +278,40 @@ public class EntradaDePerguntasActivity extends AppCompatActivity {
         spQuestaoVestibular.setSelection(0);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_info, menu);
+        //QUIMICA ORGANICA
+        if(informacoesApp.getTipoConteudo() == 1){
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.organica);
+        } else {
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.inorganica);
+        }
 
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.iv_organica_ou_inorganica){
+            //tipo de quimica (inorganica ou organica) por escrito
+            String tipoQuimica;
+            //QUIMICA ORGANICA
+            if(informacoesApp.getTipoConteudo() == 1){
+                tipoQuimica = "Organica";
+
+            } else {
+                //QUIMICA INORGANICA
+                tipoQuimica = "Inorganica";
+            }
+            Toast.makeText(informacoesApp, "Você está no modo Química "+ tipoQuimica + "\nCaso deseja trocar volte ao menu de escolha de modo (organica ou inorganica)", Toast.LENGTH_SHORT).show();
+        }
+
+        if(id == R.id.action_informacoes){
+            Toast.makeText(informacoesApp, "Clicou no item de settings", Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
+    }
 }

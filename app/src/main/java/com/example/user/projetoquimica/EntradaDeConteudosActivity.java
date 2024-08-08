@@ -6,6 +6,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,8 +37,14 @@ public class EntradaDeConteudosActivity extends AppCompatActivity{
         informacoesApp = (InformacoesApp)getApplicationContext();
 
         conteudoDB = new ConteudoDB(getApplicationContext());
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         bSalvarConteudo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,9 +73,45 @@ public class EntradaDeConteudosActivity extends AppCompatActivity{
         });
     }
 
-        public void limpaCampos(){
-            etNomeConteudo.setText("");
+    public void limpaCampos(){
+        etNomeConteudo.setText("");
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_info, menu);
+        //QUIMICA ORGANICA
+        if(informacoesApp.getTipoConteudo() == 1){
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.organica);
+        } else {
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.inorganica);
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.iv_organica_ou_inorganica){
+            //tipo de quimica (inorganica ou organica) por escrito
+            String tipoQuimica;
+            //QUIMICA ORGANICA
+            if(informacoesApp.getTipoConteudo() == 1){
+                tipoQuimica = "Organica";
+
+            } else {
+                //QUIMICA INORGANICA
+                tipoQuimica = "Inorganica";
+            }
+            Toast.makeText(informacoesApp, "Você está no modo Química "+ tipoQuimica + "\nCaso deseja trocar volte ao menu de escolha de modo (organica ou inorganica)", Toast.LENGTH_SHORT).show();
+        }
+
+        if(id == R.id.action_informacoes){
+            Toast.makeText(informacoesApp, "Clicou no item de settings", Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
+    }
 }

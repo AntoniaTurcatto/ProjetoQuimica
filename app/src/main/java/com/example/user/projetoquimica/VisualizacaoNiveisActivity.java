@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.user.banco.ConteudoDB;
 import com.example.user.banco.InformacoesApp;
@@ -76,9 +77,13 @@ public class VisualizacaoNiveisActivity extends AppCompatActivity {
         //Adaptar
         if (tipoDesempenho == 2){
             nivelConteudoAdapter = new NivelConteudoAdapter(listaNivelConteudos, trataCliqueItem, context);
-            bVisulizaTudo.setEnabled(true); ;
+            bVisulizaTudo.setEnabled(true);
+            bVisulizaTudo.setClickable(true);
         } else {
             nivelConteudoAdapter = new NivelConteudoAdapter(listaNiveisCompleta, trataCliqueItem, context); //NivelConteudoOnClickListener
+            bVisulizaTudo.setEnabled(false);
+            bVisulizaTudo.setVisibility(View.INVISIBLE);
+            bVisulizaTudo.setClickable(false);
         }
         bVisulizaTudo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,11 +97,20 @@ public class VisualizacaoNiveisActivity extends AppCompatActivity {
         rvNiveis.setLayoutManager(new LinearLayoutManager(VisualizacaoNiveisActivity.this));
         rvNiveis.setItemAnimator(new DefaultItemAnimator());
         rvNiveis.setAdapter(nivelConteudoAdapter);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         //Obter a lista de conteúdos cadastradas no Banco - FiltroActivity
         //Tendo os conteúdos, consultar quais são os níveis - QuizDiagnósticoActivity
         //Passar a lista de nível conteúdo p/ o Adapter
     }
+
     NivelConteudoAdapter.NivelConteudoOnClickListener trataCliqueItem = new NivelConteudoAdapter.NivelConteudoOnClickListener() {
         @Override
         public void onClickNivelConteudo(View view, int position) {
@@ -104,28 +118,47 @@ public class VisualizacaoNiveisActivity extends AppCompatActivity {
             Intent it = new Intent(VisualizacaoNiveisActivity.this, VisualizaUpgradeActivity.class);
             it.putExtra("nivel", nivelConteudo);
             startActivity(it);
+
+
         }
     };
 
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_info, menu);
+        //QUIMICA ORGANICA
+        if(informacoesApp.getTipoConteudo() == 1){
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.organica);
+        } else {
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.inorganica);
+        }
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if(id == R.id.iv_organica_ou_inorganica){
+            //tipo de quimica (inorganica ou organica) por escrito
+            String tipoQuimica;
+            //QUIMICA ORGANICA
+            if(informacoesApp.getTipoConteudo() == 1){
+                tipoQuimica = "Organica";
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_informacoes) {
-            return true;
+            } else {
+                //QUIMICA INORGANICA
+                tipoQuimica = "Inorganica";
+            }
+            Toast.makeText(informacoesApp, "Você está no modo Química "+ tipoQuimica + "\nCaso deseja trocar volte ao menu de escolha de modo (organica ou inorganica)", Toast.LENGTH_SHORT).show();
         }
 
-        return super.onOptionsItemSelected(item);
+        if(id == R.id.action_informacoes){
+            Toast.makeText(informacoesApp, "Clicou no item de settings", Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
     }
 }

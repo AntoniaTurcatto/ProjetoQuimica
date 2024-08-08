@@ -18,17 +18,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Cadastro conteúdo"
-                android:id="@+id/bCadastroConteudos"/>
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Cadastro pergunta"
-                android:id="@+id/bCadastroPerguntas"/>
 
             <Button
                 android:layout_width="match_parent"
@@ -36,11 +26,7 @@
                 android:text="Quiz"
                 android:id="@+id/bQuiz"/>
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Adicionar nivel de conteudo"
-                android:id="@+id/bConteudoNivel"/>
+
 
             <Button
                 android:id="@+id/bVisualizarlistaNiveisConteudos"
@@ -60,23 +46,14 @@
                 android:text="Gráficos de Desempenho por Conteúdo"
                 android:id="@+id/bGraficoDesempenhoConteudo"/>
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="10Questionários"
-                android:id="@+id/bGraficoDezQuestionarios"/>
+
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Gráfico Niveis Por Conteudo"
                 android:id="@+id/bGraficoNiveisPorConteudo"/>
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Progresso"
-                android:id="@+id/bProgresso"
-                />
+
 <!--     Seria mais uma listagem de Vidas e tentativas anteriores-->
 
 

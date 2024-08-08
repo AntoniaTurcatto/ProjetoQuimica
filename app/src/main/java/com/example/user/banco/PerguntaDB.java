@@ -110,6 +110,91 @@ public class PerguntaDB {
         for (int x = 0; x < listaNivelConteudos.size(); x++) {
             String sqlWithIntermediaria = Conexao.getTabelaPergunta() + x + "1 AS (SELECT * FROM " + Conexao.getTabelaPergunta()
                     + " INNER JOIN " + Conexao.getTabelaConteudo() + " ON " + Conexao.getTabelaPergunta() + "." + Conexao.getFkConteudoPergunta() + " = " + Conexao.getTabelaConteudo() + "." + Conexao.getIdConteudo()
+                    + " WHERE " + Conexao.getFkConteudoPergunta() + " = " + listaNivelConteudos.get(x).getConteudo().getIdConteudo()
+                    + " AND " + Conexao.getTestePrevio() + " = 0"
+                    + " AND " + Conexao.getNivelDificuldade()
+                    + " = 1 ORDER BY RANDOM() LIMIT " + quantidadesPerguntas[x][1] + "),"
+
+                    + Conexao.getTabelaPergunta() + x + "2 AS (SELECT * FROM " + Conexao.getTabelaPergunta()
+                    + " INNER JOIN " + Conexao.getTabelaConteudo() + " ON " + Conexao.getTabelaPergunta() + "." + Conexao.getFkConteudoPergunta() + " = " + Conexao.getTabelaConteudo() + "." + Conexao.getIdConteudo()
+                    + " WHERE " + Conexao.getFkConteudoPergunta() + " = " + listaNivelConteudos.get(x).getConteudo().getIdConteudo()
+                    + " AND " + Conexao.getTestePrevio() + " = 0"
+                    + " AND " + Conexao.getNivelDificuldade()
+                    + " = 2 ORDER BY RANDOM() LIMIT " + quantidadesPerguntas[x][2] + "),"
+
+                    + Conexao.getTabelaPergunta() + x + "3 AS (SELECT * FROM " + Conexao.getTabelaPergunta()
+                    + " INNER JOIN " + Conexao.getTabelaConteudo() + " ON " + Conexao.getTabelaPergunta() + "." + Conexao.getFkConteudoPergunta() + " = " + Conexao.getTabelaConteudo() + "." + Conexao.getIdConteudo()
+                    + " WHERE " + Conexao.getFkConteudoPergunta() + " = " + listaNivelConteudos.get(x).getConteudo().getIdConteudo()
+                    + " AND " + Conexao.getTestePrevio() + " = 0"
+                    + " AND " + Conexao.getNivelDificuldade()
+                    + " = 3 ORDER BY RANDOM() LIMIT " + quantidadesPerguntas[x][3] + ") ";
+
+            sqlWith = sqlWith + sqlWithIntermediaria;
+
+            String sqlUnionIntermediaria = "SELECT * FROM " + Conexao.getTabelaPergunta() + x + "1 UNION ALL "
+                    + "SELECT * FROM " + Conexao.getTabelaPergunta() + x + "2 UNION ALL "
+                    + "SELECT * FROM " + Conexao.getTabelaPergunta() + x + "3 ";
+            sqlUnion = sqlUnion + sqlUnionIntermediaria;
+
+            // para todos, tem que adicionar essas questões. Exceção é no ultimo
+            if (x < (listaNivelConteudos.size() - 1)) {
+                sqlWith = sqlWith + ", ";
+                sqlUnion = sqlUnion + "UNION ALL ";
+            }
+        }
+
+        // concatenando
+        String sql = sqlWith + sqlUnion;
+
+        Log.d("Teste", "Query SQL: " + sql);
+
+        Cursor cursor = this.bancoDados.rawQuery(sql, null, null);
+
+        while (cursor.moveToNext()) {
+
+            int idQuiz = cursor.getInt(cursor.getColumnIndex(Conexao.getIdPergunta()));
+            String enunciado = cursor.getString(cursor.getColumnIndex(Conexao.getEnunciadoPergunta()));
+            String opcaoA = cursor.getString(cursor.getColumnIndex(Conexao.getOpcaoA()));
+            String opcaoB = cursor.getString(cursor.getColumnIndex(Conexao.getOpcaoB()));
+            String opcaoC = cursor.getString(cursor.getColumnIndex(Conexao.getOpcaoC()));
+            String opcaoD = cursor.getString(cursor.getColumnIndex(Conexao.getOpcaoD()));
+            String opcaoE = cursor.getString(cursor.getColumnIndex(Conexao.getOpcaoE()));
+            int tipoTestePrevio = cursor.getInt(cursor.getColumnIndex(Conexao.getTestePrevio()));
+            char alternativaCorreta = cursor.getString(cursor.getColumnIndex(Conexao.getAlternativaCorreta())).charAt(0);
+            byte[] imagem = cursor.getBlob(cursor.getColumnIndex(Conexao.getImagemPergunta()));
+            int nivelDificuldade = cursor.getInt(cursor.getColumnIndex(Conexao.getNivelDificuldade()));
+            int questaoVestibular = cursor.getInt(cursor.getColumnIndex(Conexao.getQuestaoVestibular()));
+
+            //criando o objeto da classe conteúdo
+            int idConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getFkConteudoPergunta()));
+            String nomeConteudo = cursor.getString(cursor.getColumnIndex(Conexao.getNomeConteudo()));
+            int tipoConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getTipoConteudo()));
+
+            Conteudo meuConteudo = new Conteudo(idConteudo, nomeConteudo, tipoConteudo);
+
+            Pergunta umaPergunta = new Pergunta(idQuiz, enunciado, opcaoA, opcaoB, opcaoC, opcaoD, opcaoE, imagem, tipoTestePrevio, meuConteudo, alternativaCorreta, nivelDificuldade, questaoVestibular);
+
+            listaPerguntas.add(umaPergunta);
+        }
+
+        this.bancoDados.close();
+        return listaPerguntas;
+
+    }
+
+    public ArrayList<Pergunta> buscaPerguntasPorConteudosUnionAllComTestePrevio(ArrayList<NivelConteudo> listaNivelConteudos, int[][] quantidadesPerguntas) {
+        ArrayList<Pergunta> listaPerguntas = new ArrayList<>();
+
+        this.bancoDados = this.conexao.getWritableDatabase();
+
+        // criando as variáveis auxiliares
+        String sqlWith = "WITH ";
+        String sqlUnion = "";
+
+        // montando a query sql
+        for (int x = 0; x < listaNivelConteudos.size(); x++) {
+            String sqlWithIntermediaria = Conexao.getTabelaPergunta() + x + "1 AS (SELECT * FROM " + Conexao.getTabelaPergunta()
+                    + " INNER JOIN " + Conexao.getTabelaConteudo() + " ON " + Conexao.getTabelaPergunta() + "." + Conexao.getFkConteudoPergunta() + " = " + Conexao.getTabelaConteudo() + "." + Conexao.getIdConteudo()
                     + " WHERE " + Conexao.getFkConteudoPergunta() + " = " + listaNivelConteudos.get(x).getConteudo().getIdConteudo() + " AND " + Conexao.getNivelDificuldade()
                     + " = 1 ORDER BY RANDOM() LIMIT " + quantidadesPerguntas[x][1] + "),"
                     + Conexao.getTabelaPergunta() + x + "2 AS (SELECT * FROM " + Conexao.getTabelaPergunta()
@@ -211,7 +296,7 @@ public class PerguntaDB {
     }
 
 
-    public ArrayList<Pergunta> buscaPergunta() {
+    public ArrayList<Pergunta> buscaPergunta(Context context) {
 
         ArrayList<Pergunta> listaPerguntas = new ArrayList<>();
         this.bancoDados = this.conexao.getWritableDatabase();
@@ -234,12 +319,18 @@ public class PerguntaDB {
 
             //criando o objeto da classe conteúdo
             int idConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getFkConteudoPergunta()));
-            String nomeConteudo = cursor.getString(cursor.getColumnIndex(Conexao.getNomeConteudo()));
-            int tipoConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getTipoConteudo()));
 
-            Conteudo meuConteudo = new Conteudo(idConteudo, nomeConteudo, tipoConteudo);
+            //foi comentado pois esse a tabela não possui essa coluna
+            // String nomeConteudo = cursor.getString(cursor.getColumnIndex(Conexao.getNomeConteudo()));
+            //int tipoConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getTipoConteudo()));
 
-            Pergunta umaPergunta = new Pergunta(idQuiz, enunciado, opcaoA, opcaoB, opcaoC, opcaoD, opcaoE, imagem, testePrevio, meuConteudo, alternativaCorreta, nivelDificuldade, questaoVestibular);
+            //é necessário instanciar o conteudo do id encontrado
+            ConteudoDB conteudoDB = new ConteudoDB(context);
+            Conteudo conteudo = conteudoDB.carregaConteudoById(idConteudo);
+
+            //Conteudo meuConteudo = new Conteudo(idConteudo, conteudo.getNomeConteudo(), conteudo.getTipoConteudo());
+
+            Pergunta umaPergunta = new Pergunta(idQuiz, enunciado, opcaoA, opcaoB, opcaoC, opcaoD, opcaoE, imagem, testePrevio, conteudo, alternativaCorreta, nivelDificuldade, questaoVestibular);
             this.bancoDados.close();
 
             listaPerguntas.add(umaPergunta);

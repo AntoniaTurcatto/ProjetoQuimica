@@ -53,6 +53,8 @@
         <item>Diamante</item>
     </array>
 
+    <string name="explicacaoFeedback">%1$s</string>
+
     <string name="title_activity_nomes_conteudos">nomesConteudos</string>
     <string name="title_activity_menu_cadastro_questoes_activy">menuCadastroQuestoesActivy</string>
     <string name="title_activity_entrada_de_conteudos">EntradaDeConteudosActivity</string>
@@ -72,4 +74,5 @@
     <string name="title_activity_lista_conteudos">ListaConteudosActivity</string>
     <string name="title_activity_relatorio_detalhado2">RelatorioDetalhadoActivity2</string>
     <string name="title_activity_visualiza_progresso">VisualizaProgressoActivity</string>
+    <string name="title_activity_tela_feedback">TelaFeedbackActivity</string>
 </resources>

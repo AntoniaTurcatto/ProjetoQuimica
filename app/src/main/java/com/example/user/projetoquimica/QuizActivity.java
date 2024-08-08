@@ -1,12 +1,14 @@
 package com.example.user.projetoquimica;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.icu.text.IDNA;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,6 +50,8 @@ import org.w3c.dom.Text;
 
 import java.io.ByteArrayInputStream;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,6 +67,9 @@ public class QuizActivity extends AppCompatActivity {
     Context context;
     TextView tvDesempenhoData, tvDesempenhoPontuacaoFinal, tvTituloDesempenho;
     Button bQuizRelatorio, bQuizProgresso;
+    int acertos = 0, erros = 0;
+    float pontuacaoMedia = 0;
+    float pontuacaoGeral = 0.0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,11 +83,22 @@ public class QuizActivity extends AppCompatActivity {
         tvDesempenhoPontuacaoFinal = findViewById(R.id.tvDesempenhoPontuacaoFinal);
         bQuizRelatorio = findViewById(R.id.bQuizRelatorio);
         bQuizProgresso = findViewById(R.id.bQuizProgresso);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         informacoesApp = (InformacoesApp) getApplicationContext();
         Intent it = getIntent();
         context = getApplicationContext();
+
+        //INICIALIZANDO COMPONENTES ALERT DIALOG--------------
+
+
+//        alerta = alertaBuilder.create();
+//        alerta.show();
+
+
+        //-------------------------------------------------
+
+
         if (it != null) {
             DesempenhoQuestionario desempenhoQuestionario = (DesempenhoQuestionario) it.getSerializableExtra("desempenho");
             listaDesempenhoConteudos = desempenhoQuestionario.getListaDesempenhoConteudos();
@@ -95,16 +113,16 @@ public class QuizActivity extends AppCompatActivity {
             String dataFormatada = dateFormat.format(data);
             tvDesempenhoData.setText(dataFormatada);
 
+
             // apenas para teste
             String[] desempenho = new String[desempenhoQuestionario.getListaDesempenhoConteudos().size()];
 
             for (int x = 0; x < desempenhoQuestionario.getListaDesempenhoConteudos().size(); x++) {
                 DesempenhoConteudo desempenhoConteudo = desempenhoQuestionario.getListaDesempenhoConteudos().get(x);
                 desempenho[x] = desempenhoConteudo.getPontuacaoConteudo() + " - " + desempenhoConteudo.getQuantidadeAcertos();
-                Toast.makeText(QuizActivity.this, "Conteúdo: " + desempenhoConteudo.getConteudo().getNomeConteudo()
-                        + ", Acertos: " + desempenhoConteudo.getQuantidadeAcertos()
-                        + ", Erros: " + desempenhoConteudo.getQuantidadeErros()
-                        + ", Pontuação: " + desempenhoConteudo.getPontuacaoConteudo(), Toast.LENGTH_LONG).show();
+                acertos += desempenhoConteudo.getQuantidadeAcertos();
+                erros +=desempenhoConteudo.getQuantidadeErros();
+                pontuacaoGeral +=desempenhoConteudo.getPontuacaoConteudo();
 
                 /*
                 if (desempenhoConteudo.getPontuacaoConteudo() >= 65) {
@@ -115,6 +133,10 @@ public class QuizActivity extends AppCompatActivity {
                     startActivity(i);
                 }*/
             }
+
+            pontuacaoMedia = pontuacaoGeral/desempenhoQuestionario.getListaDesempenhoConteudos().size();
+            //ALERT DIALOG
+            exibirAlertDialogResultados();
 
             adapter = new DesempenhoFeedbackAdapter(listaDesempenhoConteudos, listaNivelConteudo, listaFeedbacks, trataCliqueItem, context); //NivelConteudoOnClickListener
             rvDesempenhoConteudo.setLayoutManager(new LinearLayoutManager(QuizActivity.this));
@@ -138,6 +160,14 @@ public class QuizActivity extends AppCompatActivity {
                 startActivity(it);
             }
         });
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
     }
 
     DesempenhoFeedbackAdapter.DesempenhoFeedbackOnClickListener trataCliqueItem = new DesempenhoFeedbackAdapter.DesempenhoFeedbackOnClickListener() {
@@ -154,27 +184,79 @@ public class QuizActivity extends AppCompatActivity {
 
 
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_info, menu);
+        //QUIMICA ORGANICA
+        if(informacoesApp.getTipoConteudo() == 1){
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.organica);
+        } else {
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.inorganica);
+        }
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if(id == R.id.iv_organica_ou_inorganica){
+            //tipo de quimica (inorganica ou organica) por escrito
+            String tipoQuimica;
+            //QUIMICA ORGANICA
+            if(informacoesApp.getTipoConteudo() == 1){
+                tipoQuimica = "Organica";
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_informacoes) {
-            return true;
+            } else {
+                //QUIMICA INORGANICA
+                tipoQuimica = "Inorganica";
+            }
+            Toast.makeText(informacoesApp, "Você está no modo Química "+ tipoQuimica + "\nCaso deseja trocar volte ao menu de escolha de modo (organica ou inorganica)", Toast.LENGTH_SHORT).show();
         }
 
-        return super.onOptionsItemSelected(item);
+        if(id == R.id.action_informacoes){
+            Toast.makeText(informacoesApp, "Clicou no item de settings", Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
     }
 
+    public void exibirAlertDialogResultados() {
+        // Create an alert builder
+        AlertDialog.Builder alertaBuilder = new AlertDialog.Builder(QuizActivity.this, R.style.Theme_DialogCustomizada);
+        alertaBuilder.setTitle("Resultados");
 
+        // set the custom layout
+        final View customLayout = getLayoutInflater().inflate(R.layout.alert_dialog_pos_quiz, null);
+        //forma reduzida
+        alertaBuilder.setView(customLayout);
+
+        // add components
+        Button btnContinuarDialog;
+        TextView tvAcertosDialog, tvErrosDialog, tvPontuacaoDialog;
+
+        btnContinuarDialog = customLayout.findViewById(R.id.btnContinuarDialog);
+
+        tvAcertosDialog = customLayout.findViewById(R.id.tvAcertosDialog);
+        tvErrosDialog = customLayout.findViewById(R.id.tvErrosDialog);
+        tvPontuacaoDialog = customLayout.findViewById(R.id.tvPontuacaoDialog);
+
+        //definindo caracteristicas dos componentes visuais do xml
+        tvAcertosDialog.setText(String.valueOf(acertos));
+        tvErrosDialog.setText(String.valueOf(erros));
+        DecimalFormat decimalFormat = new DecimalFormat("0.##");
+        tvPontuacaoDialog.setText(String.valueOf(decimalFormat.format(pontuacaoMedia)));
+
+        // create and show the alert dialog
+        final AlertDialog dialog = alertaBuilder.create();
+        dialog.show();
+
+        btnContinuarDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+    }
 }

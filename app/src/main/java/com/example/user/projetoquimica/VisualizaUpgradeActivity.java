@@ -2,6 +2,7 @@ package com.example.user.projetoquimica;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.user.banco.InformacoesApp;
 import com.example.user.banco.NivelConteudoDB;
@@ -22,7 +24,7 @@ import com.example.user.classesDominio.Feedback;
 import com.example.user.classesDominio.NivelConteudo;
 
 public class VisualizaUpgradeActivity extends AppCompatActivity {
-    TextView tvVisualizaTitulo, tvVisualizaSaudacao, tvMostrarQuantidadeVidas;
+    TextView tvVisualizaTitulo, tvVisualizaSaudacao, tvMostrarQuantidadeVidas, tvNivelConteudoVisualizaUpgradeActivity;
     ImageView ivVisualizaUpgrade, imAtomoVidas;
     Button bVisualizaUpgradeVoltar, bVisualizaPerguntas, bVisualizaHistorico, bVisualizaProgresso;
     Context context;
@@ -46,8 +48,9 @@ public class VisualizaUpgradeActivity extends AppCompatActivity {
         bVisualizaHistorico = findViewById(R.id.bVisualizaHistorico);
         bVisualizaProgresso = findViewById(R.id.bVisualizaProgresso);
 
+        tvNivelConteudoVisualizaUpgradeActivity = findViewById(R.id.tvNivelConteudoVisualizaUpgradeActivity);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Intent it = getIntent();
 
         context = getApplicationContext();
@@ -59,7 +62,28 @@ public class VisualizaUpgradeActivity extends AppCompatActivity {
             meuNivel = (NivelConteudo) it.getSerializableExtra("nivel"); //aqui n seria
             ivVisualizaUpgrade.setImageDrawable(meuNivel.getImagemNivelCaminho(context));
             tvVisualizaTitulo.setText(informacoesApp.getMeuUsuario().getNomeUsuario().substring(0,1).toUpperCase() + informacoesApp.getMeuUsuario().getNomeUsuario().substring(1).toLowerCase() + ", confira o seu percurso, e a quantidade de vidas, no conteúdo " + meuNivel.getConteudo().getNomeConteudo() + ":");
-
+            switch (meuNivel.getNivel()){
+                case COBRE:
+                    tvNivelConteudoVisualizaUpgradeActivity.setText("COBRE");
+                    tvNivelConteudoVisualizaUpgradeActivity.setTextColor(Color.parseColor("#8c4b27"));
+                    break;
+                case BRONZE:
+                    tvNivelConteudoVisualizaUpgradeActivity.setText("BRONZE");
+                    tvNivelConteudoVisualizaUpgradeActivity.setTextColor(Color.parseColor("#8c6727"));
+                    break;
+                case PRATA:
+                    tvNivelConteudoVisualizaUpgradeActivity.setText("PRATA");
+                    tvNivelConteudoVisualizaUpgradeActivity.setTextColor(Color.parseColor("#808080"));
+                    break;
+                case OURO:
+                    tvNivelConteudoVisualizaUpgradeActivity.setText("OURO");
+                    tvNivelConteudoVisualizaUpgradeActivity.setTextColor(Color.parseColor("#bda102"));
+                    break;
+                case DIAMANTE:
+                    tvNivelConteudoVisualizaUpgradeActivity.setText("DIAMANTE");
+                    tvNivelConteudoVisualizaUpgradeActivity.setTextColor(Color.parseColor("#0293a6"));
+                    break;
+            }
             imAtomoVidas.setImageDrawable(meuNivel.getImagemVidasConteudo(context));
             tvMostrarQuantidadeVidas.setText(String.valueOf(meuNivel.getVidas()) + "x");
 
@@ -97,30 +121,51 @@ public class VisualizaUpgradeActivity extends AppCompatActivity {
 //            }
 //
 //        });
+
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_info, menu);
+        //QUIMICA ORGANICA
+        if(informacoesApp.getTipoConteudo() == 1){
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.organica);
+        } else {
+            menu.findItem(R.id.iv_organica_ou_inorganica).setIcon(R.mipmap.inorganica);
+        }
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if(id == R.id.iv_organica_ou_inorganica){
+            //tipo de quimica (inorganica ou organica) por escrito
+            String tipoQuimica;
+            //QUIMICA ORGANICA
+            if(informacoesApp.getTipoConteudo() == 1){
+                tipoQuimica = "Organica";
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_informacoes) {
-            return true;
-        } else if (id == android.R.id.home) {
-            finish();
-            return true;
+            } else {
+                //QUIMICA INORGANICA
+                tipoQuimica = "Inorganica";
+            }
+            Toast.makeText(informacoesApp, "Você está no modo Química "+ tipoQuimica + "\nCaso deseja trocar volte ao menu de escolha de modo (organica ou inorganica)", Toast.LENGTH_SHORT).show();
         }
 
-        return super.onOptionsItemSelected(item);
+        if(id == R.id.action_informacoes){
+            Toast.makeText(informacoesApp, "Clicou no item de settings", Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
     }
 }
