@@ -12,14 +12,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.user.banco.ConteudoDB;
 import com.example.user.banco.InformacoesApp;
 import com.example.user.banco.NivelConteudoDB;
+import com.example.user.classesDominio.ClasseIntermediaria;
 import com.example.user.componente.ListaConteudosAdapter;
 
 public class QuizCadastroActivity extends AppCompatActivity {
 
     Button bCadastroPerguntas, bCadastroConteudos, bQuiz, bConteudoNivel, bVisualizarNiveisConteudos,
-    bDiagnostico, bGraficoDesempenhoConteudo, bGraficoDezQuestionarios, bGraficoNiveisPorConteudo, bProgresso;
+    bDiagnostico, bGraficoDesempenhoConteudo, bGraficoDezQuestionarios, bGraficoNiveisPorConteudo, bProgresso, bFeedbackMenuCadastro;
     InformacoesApp informacoesApp;
 
     @Override
@@ -40,6 +42,7 @@ public class QuizCadastroActivity extends AppCompatActivity {
         bGraficoNiveisPorConteudo = findViewById(R.id.bGraficoNiveisPorConteudo);
 //        bProgresso = findViewById(R.id.bProgresso);
         informacoesApp = (InformacoesApp)getApplicationContext();
+        bFeedbackMenuCadastro = findViewById(R.id.bFeedbackMenuCadastro);
 
 
 
@@ -122,6 +125,15 @@ public class QuizCadastroActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent it = new Intent(QuizCadastroActivity.this, GraficoNiveisPorConteudoActivity.class);
+                startActivity(it);
+            }
+        });
+
+        bFeedbackMenuCadastro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(QuizCadastroActivity.this, TelaFeedbackActivity.class);
+                it.putExtra("listaConteudos",new ConteudoDB(getApplicationContext()).buscaConteudos(informacoesApp.getTipoConteudo()));
                 startActivity(it);
             }
         });

@@ -8,42 +8,98 @@ import android.media.Image;
 import android.util.Log;
 
 import com.example.user.classesDominio.Conteudo;
+import com.example.user.classesDominio.DesempenhoConteudo;
+import com.example.user.classesDominio.DesempenhoQuestionario;
 import com.example.user.classesDominio.NivelConteudo;
 import com.example.user.classesDominio.Usuario;
 import com.example.user.componente.NivelConteudoEnum;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class NivelConteudoDB {
     private SQLiteDatabase bancoDados;
     private Conexao conexao;
-    NivelConteudo meuNivelConteudo;
+    //NivelConteudo meuNivelConteudo;
 
     public NivelConteudoDB(Context context) {
         this.conexao = new Conexao(context);
     }
-//A lista que é carregada ficaria nula  e geraria o problema
+
+    public NivelConteudoDB(Conexao conexao){
+        this.conexao = conexao;
+    }
+
+    //A lista que é carregada ficaria nula  e geraria o problema
     public ArrayList<NivelConteudo> carregaListaCompleta(Usuario meuUsuario, int tipoConteudo) {
         ArrayList<NivelConteudo> listaNiveisConteudos = new ArrayList<>();
 
         this.bancoDados = this.conexao.getWritableDatabase();
 
-        String mensagem = Conexao.getTabelaNivelConteudo() + " INNER JOIN " + Conexao.getTabelaConteudo()
+        String sql = "SELECT * FROM "+Conexao.getTabelaNivelConteudo() + " INNER JOIN " + Conexao.getTabelaConteudo()
                 + " ON " + Conexao.getTabelaNivelConteudo() + "." + Conexao.getFkConteudoNivel()
-                + " = " + Conexao.getTabelaConteudo() + "." + Conexao.getIdConteudo();
+                + " = " + Conexao.getTabelaConteudo() + "." + Conexao.getIdConteudo()
+                +" INNER JOIN "+Conexao.getTabelaDesempenhoConteudo()
+                +" ON "+Conexao.getTabelaNivelConteudo()+"."+Conexao.getFkUltimoDesempenhoConteudo()
+                +" = "+Conexao.getTabelaDesempenhoConteudo()+"."+Conexao.getIdDesempenhoConteudo()
+                +" WHERE "+Conexao.getTipoConteudo() + "=" + tipoConteudo
+                + " AND " + Conexao.getFkUsuarioNivel() + "=" + meuUsuario.getIdUsuario();
 
-        String where = Conexao.getTipoConteudo() + "=" + tipoConteudo + " and " + Conexao.getFkUsuarioNivel() + "=" + meuUsuario.getIdUsuario();
+        //String where = Conexao.getTipoConteudo() + "=" + tipoConteudo + " and " + Conexao.getFkUsuarioNivel() + "=" + meuUsuario.getIdUsuario();
 
-        Cursor cursor = this.bancoDados.query(mensagem, null, where, null, null, null, null);
+        Cursor cursor = this.bancoDados.rawQuery(sql,null,null);
 
         while (cursor.moveToNext()) {
+            //CONTEUDO
+            //Conteudo(int idConteudo, String nomeConteudo, int tipoConteudo)
+            Conteudo meuConteudo = new Conteudo(
+                    cursor.getInt(cursor.getColumnIndex(Conexao.getIdConteudo()))
+                    ,cursor.getString(cursor.getColumnIndex(Conexao.getNomeConteudo()))
+                    ,tipoConteudo
+            );
+
+            //DESENMPENHO CONTEUDO
+
+            DesempenhoConteudo desempenhoConteudo = new DesempenhoConteudo(
+                    cursor.getInt(cursor.getColumnIndex(Conexao.getIdDesempenhoConteudo()))//idDesempenhoConteudo
+                    ,meuConteudo
+                    ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadePerguntas()))
+                    ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadeAcertos()))
+                    ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadeErros()))
+                    ,cursor.getFloat(cursor.getColumnIndex(Conexao.getPontuacaoConteudo()))
+                    ,cursor.getFloat(cursor.getColumnIndex(Conexao.getMediaAcertosUltimosQuestionarios()))
+            );
+
             int idNivelConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getIdNivelConteudo()));
             int nivelBanco = cursor.getInt(cursor.getColumnIndex(Conexao.getNIVEL()));
             int tentativas = cursor.getInt(cursor.getColumnIndex(Conexao.getTENTATIVAS()));
             int vidas = cursor.getInt(cursor.getColumnIndex(Conexao.getVIDAS()));
-            int idConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getFkConteudoNivel()));
-            String nomeConteudo = cursor.getString(cursor.getColumnIndex(Conexao.getNomeConteudo()));
+            //int idConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getFkConteudoNivel()));
+            //String nomeConteudo = cursor.getString(cursor.getColumnIndex(Conexao.getNomeConteudo()));
+            int subiuOuDesceuNivel = cursor.getInt(cursor.getColumnIndex(Conexao.getSubiuOuDesceuNivel()));
+            String dataStringUltimoTeste = cursor.getString(cursor.getColumnIndex(Conexao.getDataUltimoTeste()));
+            String dataStringAtualizacaoNivel = cursor.getString(cursor.getColumnIndex(Conexao.getDataAtualizacaoNivel()));
 
+            Date dataAtualizacaoNivel = null;
+            Date dataUltimoTeste = null;
+            try {
+                if (!dataAtualizacaoNivel.equals("")){
+                    dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataStringAtualizacaoNivel);
+                } else {
+                    dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+                }
+
+                if (!dataUltimoTeste.equals("")){
+                    dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataStringUltimoTeste);
+                } else {
+                    dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+                }
+
+            } catch(ParseException parse) {
+                parse.printStackTrace();
+            }
 
             if (vidas == 0){
                 vidas = 5;
@@ -62,15 +118,157 @@ public class NivelConteudoDB {
                 nivel = NivelConteudoEnum.DIAMANTE;
             }
 
-            Conteudo meuConteudo = new Conteudo(idConteudo, nomeConteudo, tipoConteudo);
-            NivelConteudo meuNivelConteudo = new NivelConteudo(idNivelConteudo, nivel, meuUsuario, meuConteudo, tentativas, vidas);
 
-            this.bancoDados.close();
+            //Conteudo meuConteudo = new Conteudo(idConteudo, nomeConteudo, tipoConteudo);
+            NivelConteudo meuNivelConteudo = new NivelConteudo(idNivelConteudo, nivel, subiuOuDesceuNivel, dataUltimoTeste, dataAtualizacaoNivel, desempenhoConteudo,meuUsuario, meuConteudo, tentativas, vidas);
+
 
             listaNiveisConteudos.add(meuNivelConteudo);
         }
+        this.bancoDados.close();
+        return listaNiveisConteudos;
+    } //ATUALIZADO COM DATAS E SUBIUDESCEU e id do ultimo DesempenhoConteudo
+
+    public ArrayList<NivelConteudo> buscaConteudosComNivel(ArrayList<Conteudo> listaConteudos, Usuario meuUsuario) {
+        ArrayList<NivelConteudo> listaNiveisConteudos = new ArrayList<>();
+        this.bancoDados = this.conexao.getWritableDatabase();
+
+        for (int x = 0; x < listaConteudos.size(); x++) {
+            NivelConteudo nivelConteudo;
+            Conteudo meuConteudo = listaConteudos.get(x);
+            Cursor cursor = null;
+
+            try {
+                String sql = "SELECT * FROM "+Conexao.getTabelaNivelConteudo()+" nc left JOIN "+Conexao.getTabelaDesempenhoConteudo()+" dc"
+                        +" ON nc."+Conexao.getFkUltimoDesempenhoConteudo()+" = dc."+Conexao.getIdDesempenhoConteudo()
+                        +" WHERE nc."+Conexao.getFkUsuarioNivel()+" = ?"
+                        +" AND nc."+Conexao.getFkConteudoNivel()+" = ?";
+                Log.d("SQL", "ID Usuário: " + meuUsuario.getIdUsuario() + ", ID Conteúdo: " + meuConteudo.getIdConteudo());
+                cursor = this.bancoDados.rawQuery(sql, new String[]{String.valueOf(meuUsuario.getIdUsuario()), String.valueOf(meuConteudo.getIdConteudo())});
+
+                if (cursor != null && cursor.moveToFirst()) {
+                                        //nivel conteudo
+
+                    int idNivelConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getIdNivelConteudo()));
+                    int nivelBanco = cursor.getInt(cursor.getColumnIndex(Conexao.getNIVEL()));
+                    int tentativas = cursor.getInt(cursor.getColumnIndex(Conexao.getTENTATIVAS()));
+                    int vidas = cursor.getInt(cursor.getColumnIndex(Conexao.getVIDAS()));
+                    int subiuOuDesceuNivel = cursor.getInt(cursor.getColumnIndex(Conexao.getSubiuOuDesceuNivel()));
+                    String dataStringUltimoTeste = cursor.getString(cursor.getColumnIndex(Conexao.getDataUltimoTeste()));
+                    String dataStringAtualizacaoNivel = cursor.getString(cursor.getColumnIndex(Conexao.getDataAtualizacaoNivel()));
+
+                    Date dataAtualizacaoNivel = null;
+                    Date dataUltimoTeste = null;
+                    try {
+                        if (!dataStringAtualizacaoNivel.equals("")){
+                            dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(dataStringAtualizacaoNivel);
+                        } else {
+                            dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                        }
+
+                        if (!dataStringUltimoTeste.equals("")){
+                            dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(dataStringUltimoTeste);
+                        } else {
+                            dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                        }
+
+                    } catch(ParseException parse) {
+                        parse.printStackTrace();
+                    }
+
+                    NivelConteudoEnum nivel = null; //PEDRO - provisório
+
+                    if (nivelBanco == 1) {
+                        nivel = NivelConteudoEnum.COBRE;
+                    } else if (nivelBanco == 2) {
+                        nivel = NivelConteudoEnum.BRONZE;
+                    } else if (nivelBanco == 3) {
+                        nivel = NivelConteudoEnum.PRATA;
+                    } else if (nivelBanco == 4) {
+                        nivel = NivelConteudoEnum.OURO;
+                    } else if (nivelBanco == 5) {
+                        nivel = NivelConteudoEnum.DIAMANTE;
+                    }
+
+                    //NivelConteudo(int idNivelConteudo, NivelConteudoEnum nivel, int subiuOuDesceuNivel,
+                    // Date dataUltimoTeste, Date dataAtualizacaoNivel, DesempenhoConteudo ultimoDesempenhoConteudo,
+                    // Usuario usuario, Conteudo conteudo, int tentativas, int vidas)
+
+
+                    //DesempenhoConteudo(int idDesempenhoConteudo, Conteudo conteudo, int quantidadePerguntas,
+                    // int quantidadeAcertos, int quantidadeErros, float pontuacaoConteudo, float mediaAcertosUltimosQuestionarios)
+
+                    DesempenhoConteudo desempenhoConteudo;
+
+                    int fkUltimoDesempenhoConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getFkUltimoDesempenhoConteudo()));
+                    if (fkUltimoDesempenhoConteudo != 0){
+
+                        desempenhoConteudo = new DesempenhoConteudo(
+                                fkUltimoDesempenhoConteudo//idDesempenhoConteudo
+                                ,meuConteudo
+                                ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadePerguntas()))
+                                ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadeAcertos()))
+                                ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadeErros()))
+                                ,cursor.getFloat(cursor.getColumnIndex(Conexao.getPontuacaoConteudo()))
+                                ,cursor.getFloat(cursor.getColumnIndex(Conexao.getMediaAcertosUltimosQuestionarios()))
+                        );
+
+
+
+                    } else {
+                        desempenhoConteudo = new DesempenhoConteudo(
+                                meuConteudo
+                                ,0
+                                ,0
+                                ,0
+                                ,0f
+                                ,0f);
+                        new DesempenhoConteudoDB(conexao).insereDesempenhoConteudo(desempenhoConteudo);
+                        //nivelConteudo.setUltimoDesempenhoConteudo(desempenhoConteudo);
+                        desempenhoConteudo = new DesempenhoConteudoDB(conexao).buscaDesempenhoConteudoComConteudo(meuConteudo.getIdConteudo());
+                    }
+
+
+                    nivelConteudo = new NivelConteudo(idNivelConteudo, nivel, subiuOuDesceuNivel, dataUltimoTeste, dataAtualizacaoNivel, desempenhoConteudo, meuUsuario, meuConteudo, tentativas, vidas);
+                    listaNiveisConteudos.add(nivelConteudo);
+                } else {
+                    // senão encontrar o nível no banco, é pq o usuário está no nível inicial, nesse caso Cobre
+
+                    Date dataAtualizacaoNivel = null;
+                    Date dataUltimoTeste = null;
+                    try {
+                        dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                        dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                    } catch(ParseException parse) {
+                        parse.printStackTrace();
+                    }
+
+                    DesempenhoConteudo desempenhoConteudo = new DesempenhoConteudo(
+                            meuConteudo
+                            ,0
+                            ,0
+                            ,0
+                            ,0.0f
+                            ,0.0f
+                    );
+
+                    nivelConteudo = new NivelConteudo(NivelConteudoEnum.COBRE, -1, dataUltimoTeste, dataAtualizacaoNivel, desempenhoConteudo, meuUsuario, meuConteudo, 0, 5);
+                    listaNiveisConteudos.add(nivelConteudo);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+        this.bancoDados.close();
         return listaNiveisConteudos;
     }
+
+    /*
+
 
     public ArrayList<NivelConteudo> buscaConteudosComNivel(ArrayList<Conteudo> listaConteudos, Usuario meuUsuario) {
         ArrayList<NivelConteudo> listaNiveisConteudos = new ArrayList<>();
@@ -79,16 +277,64 @@ public class NivelConteudoDB {
 
         for (int x = 0; x < listaConteudos.size(); x++) {
             Conteudo meuConteudo = listaConteudos.get(x);
+            Cursor cursor;
 
-            String where = Conexao.getFkConteudoNivel() + "='" + meuConteudo.getIdConteudo() + "' and " + Conexao.getFkUsuarioNivel() + "=" + meuUsuario.getIdUsuario();
-            Cursor cursor = this.bancoDados.query(Conexao.getTabelaNivelConteudo(), null, where, null, null, null, null);
 
-            if (cursor.moveToNext()) {
+            String sql = "SELECT * FROM "+Conexao.getTabelaNivelConteudo()+" nc INNER JOIN "+Conexao.getTabelaDesempenhoConteudo()+" dc"
+                    +" ON nc."+Conexao.getFkUltimoDesempenhoConteudo()+" = dc."+Conexao.getIdDesempenhoConteudo()
+                    +" WHERE nc."+Conexao.getFkUsuarioNivel()+" = "+ meuUsuario.getIdUsuario()
+                    +" AND nc."+Conexao.getFkConteudoNivel()+" = "+meuConteudo.getIdConteudo();
+            //String where = Conexao.getFkConteudoNivel() + "='" + meuConteudo.getIdConteudo() + "' and " + Conexao.getFkUsuarioNivel() + "=" + meuUsuario.getIdUsuario();
+
+            cursor = this.bancoDados.rawQuery(sql,null, null);
+
+            if (cursor.moveToFirst()) {
                 Log.d("Teste", "Obtive: " + cursor.toString());
+                //desempenhoConteudo
+
+                //construtor utilizado:
+                //DesempenhoConteudo(int idDesempenhoConteudo, Conteudo conteudo, int quantidadePerguntas,
+                // int quantidadeAcertos, int quantidadeErros, float pontuacaoConteudo, float mediaAcertosUltimosQuestionarios)
+
+                DesempenhoConteudo desempenhoConteudo = new DesempenhoConteudo(
+                                cursor.getInt(cursor.getColumnIndex(Conexao.getIdDesempenhoConteudo()))//idDesempenhoConteudo
+                                ,meuConteudo
+                                ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadePerguntas()))
+                        ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadeAcertos()))
+                        ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadeErros()))
+                        ,cursor.getFloat(cursor.getColumnIndex(Conexao.getPontuacaoConteudo()))
+                        ,cursor.getFloat(cursor.getColumnIndex(Conexao.getMediaAcertosUltimosQuestionarios()))
+                );
+
+                //nivel conteudo
+
                 int idNivelConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getIdNivelConteudo()));
                 int nivelBanco = cursor.getInt(cursor.getColumnIndex(Conexao.getNIVEL()));
                 int tentativas = cursor.getInt(cursor.getColumnIndex(Conexao.getTENTATIVAS()));
                 int vidas = cursor.getInt(cursor.getColumnIndex(Conexao.getVIDAS()));
+                int subiuOuDesceuNivel = cursor.getInt(cursor.getColumnIndex(Conexao.getSubiuOuDesceuNivel()));
+                String dataStringUltimoTeste = cursor.getString(cursor.getColumnIndex(Conexao.getDataUltimoTeste()));
+                String dataStringAtualizacaoNivel = cursor.getString(cursor.getColumnIndex(Conexao.getDataAtualizacaoNivel()));
+
+                Date dataAtualizacaoNivel = null;
+                Date dataUltimoTeste = null;
+                try {
+                    if (!dataStringAtualizacaoNivel.equals("")){
+                        dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataStringAtualizacaoNivel);
+                    } else {
+                        dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+                    }
+
+                    if (!dataStringUltimoTeste.equals("")){
+                        dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataStringUltimoTeste);
+                    } else {
+                        dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+                    }
+
+                } catch(ParseException parse) {
+                    parse.printStackTrace();
+                }
+
                 NivelConteudoEnum nivel = null; //PEDRO - provisório
 
                 if (nivelBanco == 1) {
@@ -103,11 +349,33 @@ public class NivelConteudoDB {
                     nivel = NivelConteudoEnum.DIAMANTE;
                 }
 
-                meuNivelConteudo = new NivelConteudo(idNivelConteudo, nivel, meuUsuario, meuConteudo, tentativas, vidas);
+                //NivelConteudo(int idNivelConteudo, NivelConteudoEnum nivel, int subiuOuDesceuNivel,
+                // Date dataUltimoTeste, Date dataAtualizacaoNivel, DesempenhoConteudo ultimoDesempenhoConteudo,
+                // Usuario usuario, Conteudo conteudo, int tentativas, int vidas)
+                meuNivelConteudo = new NivelConteudo(idNivelConteudo, nivel, subiuOuDesceuNivel, dataUltimoTeste, dataAtualizacaoNivel, desempenhoConteudo, meuUsuario, meuConteudo, tentativas, vidas);
 
             } else {
                 // senão encontrar o nível no banco, é pq o usuário está no nível inicial, nesse caso Cobre
-                meuNivelConteudo = new NivelConteudo(NivelConteudoEnum.COBRE, meuUsuario, meuConteudo, 0, 5);
+
+                Date dataAtualizacaoNivel = null;
+                Date dataUltimoTeste = null;
+                try {
+                    dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+                    dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+                } catch(ParseException parse) {
+                    parse.printStackTrace();
+                }
+
+                DesempenhoConteudo desempenhoConteudo = new DesempenhoConteudo(
+                        meuConteudo
+                        ,0
+                        ,0
+                        ,0
+                        ,0.0f
+                        ,0.0f
+                );
+
+                meuNivelConteudo = new NivelConteudo(NivelConteudoEnum.COBRE, -1, dataUltimoTeste, dataAtualizacaoNivel, desempenhoConteudo, meuUsuario, meuConteudo, 0, 5);
             }
             listaNiveisConteudos.add(meuNivelConteudo);
         }
@@ -115,20 +383,65 @@ public class NivelConteudoDB {
         return listaNiveisConteudos;
     }
 
+     */
+
     public NivelConteudo buscaConteudoComNivel(Conteudo meuConteudo, Usuario meuUsuario) {
-
+        NivelConteudo nivelConteudo;
         this.bancoDados = this.conexao.getWritableDatabase();
+        String sql = "SELECT * FROM "+Conexao.getTabelaNivelConteudo() + " Left JOIN " + Conexao.getTabelaConteudo()
+                + " ON " + Conexao.getTabelaNivelConteudo() + "." + Conexao.getFkConteudoNivel()
+                + " = " + Conexao.getTabelaConteudo() + "." + Conexao.getIdConteudo()
+                +" INNER JOIN "+Conexao.getTabelaDesempenhoConteudo()
+                +" ON "+Conexao.getTabelaNivelConteudo()+"."+Conexao.getFkUltimoDesempenhoConteudo()
+                +" = "+Conexao.getTabelaDesempenhoConteudo()+"."+Conexao.getIdDesempenhoConteudo()
+                +" WHERE "+Conexao.getFkConteudoNivel() + "='" + meuConteudo.getIdConteudo()
+                +"' and " + Conexao.getFkUsuarioNivel() + "=" + meuUsuario.getIdUsuario()
+                +" AND " + Conexao.getIdNivelConteudo()+"="+Conexao.getFkUltimoDesempenhoConteudo();
 
-        String where = Conexao.getFkConteudoNivel() + "='" + meuConteudo.getIdConteudo() + "' and " + Conexao.getFkUsuarioNivel() + "=" + meuUsuario.getIdUsuario();
-        Cursor cursor = this.bancoDados.query(Conexao.getTabelaNivelConteudo(), null, where, null, null, null, null);
+        //String where = Conexao.getFkConteudoNivel() + "='" + meuConteudo.getIdConteudo() + "' and " + Conexao.getFkUsuarioNivel() + "=" + meuUsuario.getIdUsuario();
+        //Cursor cursor = this.bancoDados.query(Conexao.getTabelaNivelConteudo(), null, where, null, null, null, null);
 
+        Cursor cursor = this.bancoDados.rawQuery(sql, null, null);
         if (cursor.moveToNext()) {
+            DesempenhoConteudo desempenhoConteudo = new DesempenhoConteudo(
+                    cursor.getInt(cursor.getColumnIndex(Conexao.getIdDesempenhoConteudo()))//idDesempenhoConteudo
+                    ,meuConteudo
+                    ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadePerguntas()))
+                    ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadeAcertos()))
+                    ,cursor.getInt(cursor.getColumnIndex(Conexao.getQuantidadeErros()))
+                    ,cursor.getFloat(cursor.getColumnIndex(Conexao.getPontuacaoConteudo()))
+                    ,cursor.getFloat(cursor.getColumnIndex(Conexao.getMediaAcertosUltimosQuestionarios()))
+            );
+
             Log.d("Teste", "Obtive: " + cursor.toString());
             Log.d("Teste", "Nivel: " + cursor.getColumnIndex(Conexao.getNIVEL()));
             int idNivelConteudo = cursor.getInt(cursor.getColumnIndex(Conexao.getIdNivelConteudo()));
             int nivelBanco = cursor.getInt(cursor.getColumnIndex(Conexao.getNIVEL()));
             int tentativas = cursor.getInt(cursor.getColumnIndex(Conexao.getTENTATIVAS()));
             int vidas = cursor.getInt(cursor.getColumnIndex(Conexao.getVIDAS()));
+            int subiuOuDesceuNivel = cursor.getInt(cursor.getColumnIndex(Conexao.getSubiuOuDesceuNivel()));
+            String dataStringUltimoTeste = cursor.getString(cursor.getColumnIndex(Conexao.getDataUltimoTeste()));
+            String dataStringAtualizacaoNivel = cursor.getString(cursor.getColumnIndex(Conexao.getDataAtualizacaoNivel()));
+
+            Date dataAtualizacaoNivel = null;
+            Date dataUltimoTeste = null;
+            try {
+                if (!dataAtualizacaoNivel.equals("")){
+                    dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(dataStringAtualizacaoNivel);
+                } else {
+                    dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                }
+
+                if (!dataUltimoTeste.equals("")){
+                    dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(dataStringUltimoTeste);
+                } else {
+                    dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                }
+
+            } catch(ParseException parse) {
+                parse.printStackTrace();
+            }
+
             NivelConteudoEnum nivel = null;
 
             if (nivelBanco == 1) {
@@ -143,14 +456,33 @@ public class NivelConteudoDB {
                 nivel = NivelConteudoEnum.DIAMANTE;
             }
 
-            meuNivelConteudo = new NivelConteudo(idNivelConteudo, nivel, meuUsuario, meuConteudo, tentativas, vidas);
+            nivelConteudo = new NivelConteudo(idNivelConteudo, nivel, subiuOuDesceuNivel, dataUltimoTeste, dataAtualizacaoNivel, desempenhoConteudo, meuUsuario, meuConteudo, tentativas, vidas);
 
         } else {
-            // senão encontrar o nível no banco, é pq o usuário está no nível inicial, nesse caso Cobre
-            meuNivelConteudo = new NivelConteudo(NivelConteudoEnum.COBRE, meuUsuario, meuConteudo, 0, 5);
+            // se não encontrar o nível no banco é pq o usuário está no nível inicial, nesse caso Cobre
+
+            DesempenhoConteudo desempenhoConteudo = new DesempenhoConteudo(
+                    meuConteudo
+                    ,0
+                    ,0
+                    ,0
+                    ,0.0f
+                    ,0.0f
+            );
+
+            Date dataAtualizacaoNivel = null;
+            Date dataUltimoTeste = null;
+            try {
+                dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+            } catch(ParseException parse) {
+                parse.printStackTrace();
+            }
+
+            nivelConteudo = new NivelConteudo(NivelConteudoEnum.COBRE, 0, dataUltimoTeste, dataAtualizacaoNivel, desempenhoConteudo, meuUsuario, meuConteudo, 0, 5);
         }
         this.bancoDados.close();
-        return meuNivelConteudo;
+        return nivelConteudo;
     }
 
     public void incrementaNivel(NivelConteudo meuNivelConteudo, Usuario meuUsuario){
@@ -160,10 +492,13 @@ public class NivelConteudoDB {
 
         this.bancoDados = this.conexao.getWritableDatabase();
 
-        if (meuNivelConteudo.getIdNivelConteudo() != -1) {
+            if (meuNivelConteudo.getIdNivelConteudo() != -1) {
             where = Conexao.getIdNivelConteudo() + "=" + meuNivelConteudo.getIdNivelConteudo();
             Log.d("Teste", "Entrei no if de incrementaNivel em NivelConteudoDB!");
             valores.put(Conexao.getNIVEL(), meuNivelConteudo.getNivel().getValor());
+            valores.put(Conexao.getSubiuOuDesceuNivel(), 1);
+            valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
+            valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
             //update em NivelConteudo
             long retorno = this.bancoDados.update(Conexao.getTabelaNivelConteudo(), valores, where, null);
         } else {
@@ -171,6 +506,9 @@ public class NivelConteudoDB {
             valores.put(Conexao.getFkConteudoNivel(), meuNivelConteudo.getConteudo().getIdConteudo());
             valores.put(Conexao.getNIVEL(), meuNivelConteudo.getNivel().getValor());
             valores.put(Conexao.getFkUsuarioNivel(), meuUsuario.getIdUsuario());
+            valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
+            valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
+            valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
             //insert em NivelConteudo, não update
             long retorno = this.bancoDados.insert(Conexao.getTabelaNivelConteudo(), null, valores);
             if (retorno >= 0) {
@@ -197,17 +535,23 @@ public class NivelConteudoDB {
         ContentValues valores = new ContentValues();
         String where;
         this.bancoDados = this.conexao.getWritableDatabase();
-        if (meuNivelConteudo.getIdNivelConteudo() != -1) {
+        if (meuNivelConteudo.getIdNivelConteudo() != -1 && meuNivelConteudo.getNivel().getValor()>1) {
             where = Conexao.getIdNivelConteudo() + "=" + meuNivelConteudo.getIdNivelConteudo() + " AND "+ Conexao.getFkUsuarioNivel()+"="+ meuUsuario.getIdUsuario(); //Pedro - Peguntar se isso não deveria estar em todos os lugares
             Log.d("Teste", "Entrei no if de decaiNivel em NivelConteudoDB!");
             valores.put(Conexao.getNIVEL(), meuNivelConteudo.getNivel().getValor());
+            valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
+            valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
+            valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
             //update em NivelConteudo
             long retorno = this.bancoDados.update(Conexao.getTabelaNivelConteudo(), valores, where, null);
         } else {
-            Log.d("Teste", "Entrei no else de incrementaNivel em NivelConteudoDB!");
+            Log.d("Teste", "Entrei no else de decaiNivel em NivelConteudoDB!");
             valores.put(Conexao.getFkConteudoNivel(), meuNivelConteudo.getConteudo().getIdConteudo());
             valores.put(Conexao.getNIVEL(), meuNivelConteudo.getNivel().getValor());
             valores.put(Conexao.getFkUsuarioNivel(), meuUsuario.getIdUsuario());
+            valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
+            valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
+            valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
             //insert em NivelConteudo, não update
             long retorno = this.bancoDados.insert(Conexao.getTabelaNivelConteudo(), null, valores);
             if (retorno >= 0) {
@@ -235,12 +579,23 @@ public class NivelConteudoDB {
         ContentValues valores;
         valores = new ContentValues();
         String where;
-        String retorno = "";
+        String retorno;
         Log.d("Teste","Estou indo realizar a operacao em alteraNivel em NivelConteudoDB!");
         this.bancoDados = this.conexao.getWritableDatabase();
 
         where = Conexao.getIdNivelConteudo() + "=" + meuNivelConteudo.getIdNivelConteudo();
         valores.put(Conexao.getNIVEL(), meuNivelConteudo.getNivel().getValor());
+        //para caso o atributo Nivel seja setado sem alterar o NivelAnterior, caso seja setado vai funcionar igual
+        if (meuNivelConteudo.getNivel().getValor() > meuNivelConteudo.getNivelAnterior().getValor()){
+            valores.put(Conexao.getSubiuOuDesceuNivel(), 1);
+        } else if (meuNivelConteudo.getNivel().getValor() < meuNivelConteudo.getNivelAnterior().getValor()){
+            valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
+        } else {
+            valores.put(Conexao.getSubiuOuDesceuNivel(), 0);
+        }
+        valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
+        valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
+
         //update em NivelConteudo
         long resultado = this.bancoDados.update(Conexao.getTabelaNivelConteudo(), valores, where, null);
         Log.d("Teste","Ralizei a operacao em alteraNivel em NivelConteudoDB!");
@@ -273,6 +628,9 @@ public class NivelConteudoDB {
         valores.put(Conexao.getVIDAS(), meuNivelConteudo.getVidas());
         valores.put(Conexao.getFkConteudoNivel(), meuNivelConteudo.getConteudo().getIdConteudo());
         valores.put(Conexao.getFkUsuarioNivel(), meuNivelConteudo.getUsuario().getIdUsuario());
+        valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
+        valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
+        valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
 
         resultado = this.bancoDados.insert(Conexao.getTabelaNivelConteudo(), null, valores);
         this.bancoDados.close();
@@ -322,6 +680,10 @@ public class NivelConteudoDB {
             valores.put(Conexao.getFkConteudoNivel(), meuNivelConteudo.getConteudo().getIdConteudo());
             valores.put(Conexao.getTENTATIVAS(), meuNivelConteudo.getTentativas());
             valores.put(Conexao.getFkUsuarioNivel(), meuUsuario.getIdUsuario());
+            valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
+            valores.put(Conexao.getDataUltimoTeste(), new Date(System.currentTimeMillis()).toString());
+            valores.put(Conexao.getDataAtualizacaoNivel(), "Sat Jan 01 00:00:00 GMT+00:00 1");
+            //EEE MMM dd HH:mm:ss zzz yyyy
             //insert em NivelConteudo, não update
             long retorno = this.bancoDados.insert(Conexao.getTabelaNivelConteudo(), null, valores);
             if (retorno >= 0) {
@@ -365,6 +727,33 @@ public class NivelConteudoDB {
         }
     }
 
+    public void atualizaDatas(ArrayList<NivelConteudo> listaNivelConteudo, Usuario usuario){
+        for (NivelConteudo nivelConteudo: listaNivelConteudo){
+            atualizaDatas(nivelConteudo, usuario);
+        }
+    }
+
+    public void atualizaDatas(NivelConteudo nivelConteudo, Usuario usuario){
+        this.bancoDados = this.conexao.getWritableDatabase();
+        ContentValues valores = new ContentValues();
+        String where;
+
+        if (nivelConteudo.getIdNivelConteudo() != -1){
+            where = Conexao.getIdNivelConteudo()+" = "+nivelConteudo.getIdNivelConteudo()+" AND "+Conexao.getFkUsuarioNivel()+" = "+usuario.getIdUsuario();
+            //  dd/MM/yyyy HH:mm:ss
+            valores.put(Conexao.getDataUltimoTeste(),new Date(System.currentTimeMillis()).toString());
+            //Update em NivelConteudoDB
+            long retorno = bancoDados.update(Conexao.getTabelaNivelConteudo(), valores, where, null);
+            if (retorno == -1){
+                Log.d("Teste","Erro ao atulziar as datas em atualizaVidas NivelConteudoDB");
+            } else {
+                Log.d("Teste","Datas atualizadas com sucesso em atualizaVidas NivelConteudoDB");
+            }
+        }
+        this.bancoDados.close();
+        valores.clear();
+    }
+
     /*public Image carregaImagemNivel(){
         Image imagem;
         String where = Conexao.getImagemNivel();
@@ -398,4 +787,42 @@ public class NivelConteudoDB {
 
         return imagem;
     }*/
+
+    public void atualizaDesempenhoConteudo(ArrayList<NivelConteudo> listaNivelConteudo, DesempenhoQuestionario desempenhoQuestionario){
+
+        ContentValues valores = new ContentValues();
+        String where;
+        DesempenhoConteudoDB desempenhoConteudoDB = new DesempenhoConteudoDB(conexao);
+
+        ArrayList<DesempenhoConteudo> desempenhoConteudoArrayListAtualizada = new ArrayList<>();
+
+        for (int i = 0; i < desempenhoQuestionario.getListaDesempenhoConteudos().size(); i++){
+            desempenhoConteudoDB.insereDesempenhoConteudo(desempenhoQuestionario.getListaDesempenhoConteudos().get(i));
+            DesempenhoConteudo desempenhoConteudoAtual = desempenhoConteudoDB.buscaUltimos3DesempenhosConteudosComConteudo(listaNivelConteudo.get(i).getConteudo().getIdConteudo()).get(0);
+            desempenhoConteudoArrayListAtualizada.add(desempenhoConteudoAtual);
+        }
+
+        desempenhoQuestionario.setListaDesempenhoConteudos(desempenhoConteudoArrayListAtualizada);
+
+        for (int i = 0; i < listaNivelConteudo.size(); i++){
+            if (listaNivelConteudo.get(i).getIdNivelConteudo() != -1 ){
+                where = Conexao.getIdNivelConteudo()+" = "+listaNivelConteudo.get(i).getIdNivelConteudo()+" AND "+Conexao.getFkUsuarioNivel()+" = "+desempenhoQuestionario.getMeuUsuario().getIdUsuario();
+                valores.put(Conexao.getFkUltimoDesempenhoConteudo(), desempenhoQuestionario.getListaDesempenhoConteudos().get(i).getIdDesempenhoConteudo());
+                valores.put(Conexao.getNIVEL(), listaNivelConteudo.get(i).getNivel().getValor());
+                //Update em NivelConteudoDB
+                this.bancoDados = this.conexao.getWritableDatabase();
+                long retorno = bancoDados.update(Conexao.getTabelaNivelConteudo(), valores, where, null);
+                if (retorno == -1){
+                    Log.d("Teste","Erro ao atulziar UltimoDesempenhoConteudo em NivelConteudoDB");
+                } else {
+                    Log.d("Teste","UltimoDesempenhoConteudo atualizado com sucesso em NivelConteudoDB");
+                }
+            }
+
+        }
+
+
+        this.bancoDados.close();
+        valores.clear();
+    }
 }

@@ -82,23 +82,17 @@
                     android:layout_height="wrap_content"
                     android:text="Tentativas restantes para subir de nível: xx" />
 
-                <LinearLayout
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:text="Por que estou nesse nível? "
+                    android:textColor="#FF3F3F" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Por que estou nesse nível? "
-                        android:textColor="#FF3F3F" />
-
-                    <TextView
-                        android:id="@+id/tvExplicacaoTelaFeedback"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/explicacaoFeedback" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/tvExplicacaoTelaFeedback"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/explicacaoFeedback" />
             </LinearLayout>
         </LinearLayout>
     </android.support.v7.widget.CardView>

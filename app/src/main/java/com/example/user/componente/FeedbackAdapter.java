@@ -1,6 +1,7 @@
 package com.example.user.componente;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import com.example.user.classesDominio.ClasseIntermediaria;
 import com.example.user.classesDominio.Conteudo;
 import com.example.user.classesDominio.Feedback;
 import com.example.user.classesDominio.NivelConteudo;
+import com.example.user.classesDominio.Pergunta;
 import com.example.user.classesDominio.Usuario;
 import com.example.user.projetoquimica.R;
 
@@ -21,17 +23,14 @@ import java.util.List;
 
 public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackAdapter.MyViewHolder> {
 
-    private List<Feedback> listaFeedback;
     private List<NivelConteudo> listaNivelConteudo;
-    private ArrayList<Conteudo> listaConteudos;
     private FeedbackOnClickListener feedbackOnClickListener;
     private ClasseIntermediaria classeIntermediaria;
     private InformacoesApp app;
     private List<String> listaExplicacoes;
     private Usuario usuario;
 
-    public FeedbackAdapter(Usuario usuario, List<Feedback> listaFeedback, ArrayList<Conteudo> listaConteudo, FeedbackOnClickListener feedbackOnClickListener, Context context) {
-        this.listaFeedback = listaFeedback;
+    public FeedbackAdapter(Usuario usuario, ArrayList<Conteudo> listaConteudos, FeedbackOnClickListener feedbackOnClickListener, Context context) {
         this.feedbackOnClickListener = feedbackOnClickListener;
         classeIntermediaria = new ClasseIntermediaria(context);
         //LOGICA DA EXPLICAÇÃO:======================================================================================
@@ -44,7 +43,7 @@ public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackAdapter.MyView
         //PARÂMETROS:
         //      Usuario usuario, List<NivelConteudo> listaNivelConteudo
         listaNivelConteudo = classeIntermediaria.carregaListaDeNivelConteudoComConteudo(listaConteudos, usuario);
-        listaExplicacoes = classeIntermediaria.criaVariasExplicacoesFeedback(usuario, listaConteudo);
+        listaExplicacoes = classeIntermediaria.criaVariasExplicacoesFeedback(usuario, listaConteudos);
     }
 
     @Override
@@ -55,33 +54,75 @@ public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackAdapter.MyView
 
     @Override
     public void onBindViewHolder(final FeedbackAdapter.MyViewHolder holder, final int position){
-        Feedback feedbackAtual = listaFeedback.get(position);
-        NivelConteudo nivelConteudoAtual = listaNivelConteudo.get(position);
-        holder.tvNomeConteudoTelaFeedback.setText(feedbackAtual.getConteudo().getNomeConteudo());
+        final NivelConteudo nivelConteudoAtual = listaNivelConteudo.get(position);
+        holder.tvNomeConteudoTelaFeedback.setText(nivelConteudoAtual.getConteudo().getNomeConteudo());
         switch (nivelConteudoAtual.getNivel().getValor()){
             case 1:
                 holder.tvNivelAtualTelaFeedback.setText("Cobre");
+                holder.ivIconeNivelTelaFeedback.setImageResource(R.drawable.ic_cobre);
                 break;
             case 2:
                 holder.tvNivelAtualTelaFeedback.setText("Bronze");
+                holder.ivIconeNivelTelaFeedback.setImageResource(R.drawable.ic_bronze);
                 break;
             case 3:
                 holder.tvNivelAtualTelaFeedback.setText("Prata");
+                holder.ivIconeNivelTelaFeedback.setImageResource(R.drawable.ic_prata);
                 break;
             case 4:
                 holder.tvNivelAtualTelaFeedback.setText("Ouro");
+                holder.ivIconeNivelTelaFeedback.setImageResource(R.drawable.ic_ouro);
                 break;
             case 5:
                 holder.tvNivelAtualTelaFeedback.setText("Diamante");
+                holder.ivIconeNivelTelaFeedback.setImageResource(R.drawable.ic_diamante);
                 break;
             default:
                 holder.tvNivelAtualTelaFeedback.setText("ERRO");
+                holder.ivIconeNivelTelaFeedback.setImageResource(R.drawable.ic_cobre);
+        }
+        switch (nivelConteudoAtual.getVidas()){
+            case 1:
+                holder.ivQuantidadeVidasTelaFeedback.setImageResource(R.drawable.ic_atomovida1);
+                break;
+            case 2:
+                holder.ivQuantidadeVidasTelaFeedback.setImageResource(R.drawable.ic_atomovida2);
+                break;
+            case 3:
+                holder.ivQuantidadeVidasTelaFeedback.setImageResource(R.drawable.ic_atomovida3);
+                break;
+            case 4:
+                holder.ivQuantidadeVidasTelaFeedback.setImageResource(R.drawable.ic_atomovida4);
+                break;
+            case 5:
+                holder.ivQuantidadeVidasTelaFeedback.setImageResource(R.drawable.ic_atomovida5);
+                break;
+            default:
+                holder.ivQuantidadeVidasTelaFeedback.setImageResource(R.drawable.ic_atomovida);
+                break;
         }
 
         holder.tvQuantidadeVidasTelaFeedback.setText(nivelConteudoAtual.getVidas()+"x");
-        holder.tvTentativasRestantesTelaFeedback.setText(nivelConteudoAtual.getTentativas());
+        holder.tvTentativasRestantesTelaFeedback.setText(String.valueOf(nivelConteudoAtual.getTentativas()));
         //explicação
         holder.tvExplicacaoTelaFeedback.setText(listaExplicacoes.get(position));
+
+        // tratando o clique no item
+        if (feedbackOnClickListener != null) {
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    feedbackOnClickListener.onClickFeedback(view, position, nivelConteudoAtual, listaExplicacoes.get(position));
+                }
+            });
+        }
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return listaNivelConteudo.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
@@ -110,6 +151,6 @@ public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackAdapter.MyView
     }
 
     public interface FeedbackOnClickListener{
-        public void onClickFeedback(View view, int position);
+        public void onClickFeedback(View view, int position, NivelConteudo nivelConteudo, String explicacao);
     }
 }

@@ -66,7 +66,7 @@ public class QuizActivity extends AppCompatActivity {
     ArrayList<Pergunta> listaPerguntas;
     Context context;
     TextView tvDesempenhoData, tvDesempenhoPontuacaoFinal, tvTituloDesempenho;
-    Button bQuizRelatorio, bQuizProgresso;
+    Button bQuizRelatorio, bQuizProgresso, bQuizFeedbackPosQuiz;
     int acertos = 0, erros = 0;
     float pontuacaoMedia = 0;
     float pontuacaoGeral = 0.0f;
@@ -83,20 +83,12 @@ public class QuizActivity extends AppCompatActivity {
         tvDesempenhoPontuacaoFinal = findViewById(R.id.tvDesempenhoPontuacaoFinal);
         bQuizRelatorio = findViewById(R.id.bQuizRelatorio);
         bQuizProgresso = findViewById(R.id.bQuizProgresso);
+        bQuizFeedbackPosQuiz = findViewById(R.id.bQuizFeedbackPosQuiz);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         informacoesApp = (InformacoesApp) getApplicationContext();
         Intent it = getIntent();
         context = getApplicationContext();
-
-        //INICIALIZANDO COMPONENTES ALERT DIALOG--------------
-
-
-//        alerta = alertaBuilder.create();
-//        alerta.show();
-
-
-        //-------------------------------------------------
 
 
         if (it != null) {
@@ -147,17 +139,30 @@ public class QuizActivity extends AppCompatActivity {
         bQuizRelatorio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent it = new Intent(QuizActivity.this, RelatorioActivity.class );
-                it.putExtra("listaPerguntas", listaPerguntas);
-                startActivity(it);
+            Intent it = new Intent(QuizActivity.this, RelatorioActivity.class );
+            it.putExtra("listaPerguntas", listaPerguntas);
+            startActivity(it);
             }
         });
         bQuizProgresso.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent it = new Intent(QuizActivity.this, VisualizaProgressoActivity.class);
-                it.putExtra("listaConteudo", listaNivelConteudo);
-                startActivity(it);
+            Intent it = new Intent(QuizActivity.this, VisualizaProgressoActivity.class);
+            it.putExtra("listaConteudo", listaNivelConteudo);
+            startActivity(it);
+            }
+        });
+
+        bQuizFeedbackPosQuiz.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            Intent it = new Intent(QuizActivity.this, TelaFeedbackActivity.class);
+            ArrayList<Conteudo> listaConteudo = new ArrayList<>();
+            for (NivelConteudo nivel: listaNivelConteudo){
+                listaConteudo.add(nivel.getConteudo());
+            }
+            it.putExtra("listaConteudos", listaConteudo);
+            startActivity(it);
             }
         });
 

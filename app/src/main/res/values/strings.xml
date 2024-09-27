@@ -75,4 +75,5 @@
     <string name="title_activity_relatorio_detalhado2">RelatorioDetalhadoActivity2</string>
     <string name="title_activity_visualiza_progresso">VisualizaProgressoActivity</string>
     <string name="title_activity_tela_feedback">TelaFeedbackActivity</string>
+    <string name="title_activity_tela_feedback_detalhada">TelaFeedbackDetalhada</string>
 </resources>

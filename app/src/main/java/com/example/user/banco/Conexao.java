@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class Conexao extends SQLiteOpenHelper {
     private SQLiteDatabase db;
     private static final String NOME_BANCO = "DadosQuimica.db";
-    private static final int VERSAO = 11;
+    private static final int VERSAO = 18;
 
     public Conexao(Context context) {
         super(context,NOME_BANCO,null,VERSAO);
@@ -54,6 +54,7 @@ public class Conexao extends SQLiteOpenHelper {
     private static final String QUANTIDADE_ACERTOS = "quantidadeAcertos";
     private static final String QUANTIDADE_ERROS = "quantidadeErros";
     private static final String PONTUACAO_CONTEUDO = "pontuacao";
+    private static final String MEDIA_ACERTOS_ULTIMOS_QUESTIONARIOS= "mediaAcertosUltimosQuestionarios";
     private static final String FK_DESEMPENHO_QUESTIONARIO = "fk_idDesempenhoQuestionario";
 
     //TABELA DESEMPENHO QUESTIONÁRIO
@@ -130,13 +131,16 @@ public class Conexao extends SQLiteOpenHelper {
     private static final String FK_USUARIO_NIVEL = "fk_idUsuario";
     private static final String FK_CONTEUDO_NIVEL = "fk_idConteudo";
     private static final String NIVEL = "nivel";
+    private static final String SUBIU_OU_DESCEU_NIVEL = "subiuOuDesceuNivel";//-1=desceu 1=subiu 0=começou agora
+    private static final String DATA_ATUALIZACAO_NIVEL = "dataAtualizacaoNivel";
+    private static final String DATA_ULTIMO_TESTE = "dataUltimoTeste";
     private static final String TENTATIVAS = "tentativas";
     private static final String VIDAS = "vidas";
     private static final String IMAGEM_NIVEL = "imagem";
+    private static final String FK_ULTIMO_DESEMPENHO_CONTEUDO = "fk_ultimoDesempenhoConteudo"; //vai estar la tambem a taxa de acerto dos ultimos questionarios
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_USUARIO);
         String sql = "CREATE TABLE "+TABELA_USUARIO+
                 "("+_ID_USUARIO+" integer primary key autoincrement," +
@@ -207,6 +211,7 @@ public class Conexao extends SQLiteOpenHelper {
                 QUANTIDADE_ACERTOS+" INTEGER,"+
                 QUANTIDADE_ERROS+" INTEGER,"+
                 PONTUACAO_CONTEUDO+" FLOAT,"+
+                MEDIA_ACERTOS_ULTIMOS_QUESTIONARIOS+" FLOAT,"+//PARA DESCOBRIR FAZER SELECT WHERE FK_CONTEUDO = CONTEUDO E PEGAR OS ULTIMOS REALIZADOS, LIMITE 5
                 FK_CONTEUDO_DESEMPENHO_CONTEUDO+" INTEGER,"+
                 FK_DESEMPENHO_QUESTIONARIO+" INTEGER,"+
                 " FOREIGN KEY ("+FK_CONTEUDO_DESEMPENHO_CONTEUDO+") REFERENCES " + TABELA_CONTEUDO + "("+_ID_CONTEUDO + "), "+
@@ -217,14 +222,19 @@ public class Conexao extends SQLiteOpenHelper {
         sql = "CREATE TABLE "+TABELA_NIVEL_CONTEUDO+
                 "("+_ID_NIVEL_CONTEUDO+" integer primary key autoincrement," +
                 NIVEL+" INTEGER,"+
+                DATA_ATUALIZACAO_NIVEL +" VARCHAR(30),"+
+                DATA_ULTIMO_TESTE +" VARCHAR(30),"+
+                SUBIU_OU_DESCEU_NIVEL +" TINYINT,"+
                 TENTATIVAS+ " INTEGER,"+
                 VIDAS+ " INTEGER,"+
                 IMAGEM_NIVEL+" VARCHAR(45),"+
                 FK_USUARIO_NIVEL+" INTEGER,"+
                 FK_CONTEUDO_NIVEL+" INTEGER,"+
+                FK_ULTIMO_DESEMPENHO_CONTEUDO +" INTEGER,"+
                 " FOREIGN KEY ("+FK_USUARIO_NIVEL+") REFERENCES " + TABELA_USUARIO + "("+_ID_USUARIO +"), "+
-                " FOREIGN KEY ("+FK_CONTEUDO_NIVEL+") REFERENCES " + TABELA_CONTEUDO + "("+_ID_CONTEUDO +"))";
-        db.execSQL(sql);
+                " FOREIGN KEY ("+FK_CONTEUDO_NIVEL+") REFERENCES " + TABELA_CONTEUDO + "("+_ID_CONTEUDO +"), "+
+                " FOREIGN KEY ("+ FK_ULTIMO_DESEMPENHO_CONTEUDO +") REFERENCES "+ TABELA_DESEMPENHO_CONTEUDO + "("+_ID_DESEMPENHO_CONTEUDO+"))";
+                db.execSQL(sql);
 
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_HIDROCARBONETO);
@@ -295,37 +305,37 @@ public class Conexao extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_USUARIO);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_RESUMO);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_PERGUNTA);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_CONTEUDO);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_HIDROCARBONETO);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_MOLECULA);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_ELEMENTO_DETALHADO);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_INFORMACOES_COMPOSTO);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_ELEMENTO_INFORMACOES);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_DESEMPENHO_CONTEUDO);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_DESEMPENHO_QUESTIONARIO);
-        onCreate(db);
+        //onCreate(db);
 
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_NIVEL_CONTEUDO);
         onCreate(db);
@@ -550,5 +560,25 @@ public class Conexao extends SQLiteOpenHelper {
 
     public static String getVIDAS() {
         return VIDAS;
+    }
+
+    public static String getSubiuOuDesceuNivel() {
+        return SUBIU_OU_DESCEU_NIVEL;
+    }
+
+    public static String getDataAtualizacaoNivel() {
+        return DATA_ATUALIZACAO_NIVEL;
+    }
+
+    public static String getDataUltimoTeste() {
+        return DATA_ULTIMO_TESTE;
+    }
+
+    public static String getMediaAcertosUltimosQuestionarios() {
+        return MEDIA_ACERTOS_ULTIMOS_QUESTIONARIOS;
+    }
+
+    public static String getFkUltimoDesempenhoConteudo() {
+        return FK_ULTIMO_DESEMPENHO_CONTEUDO;
     }
 }

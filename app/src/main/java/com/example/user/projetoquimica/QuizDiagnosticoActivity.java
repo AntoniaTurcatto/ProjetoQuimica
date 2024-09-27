@@ -157,7 +157,7 @@ public class QuizDiagnosticoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 salvaResposta();
                 boolean respondeuTodas = verificaResposta();
-                if (respondeuTodas == true) {
+                if (respondeuTodas) {
                     DesempenhoQuestionario desempenhoQuestionario = null;
                     listaFeedbacks = new ArrayList<>();
                     //carregar a lista de feedbacks (algo parecido com o que fazemos no diagnóstico q precisa consolidar, fazer aqui no quiz para dar um feedback
@@ -195,6 +195,7 @@ public class QuizDiagnosticoActivity extends AppCompatActivity {
                     desempenhoQuestionario.calculaPontuacaoFinal();
                     desempenhoQuestionarioDB = new DesempenhoQuestionarioDB(getApplicationContext());
                     desempenhoQuestionarioDB.insereDesempenhoQuestionario(desempenhoQuestionario);
+
                     //após ter consolidado no banco e estiver no quiz (tipo = 1) chamar tela passando desempenho (e talvez a lista de feedback) e mostrar as eficiencias dos conteúdos
                     //fazer por conteúdo as notas e colocar a nota final do quiz
                     Toast.makeText(QuizDiagnosticoActivity.this, "DESEMPENHO NO QUESTIONARIO\nData: " + desempenhoQuestionario.getData() + ", pontuação final: " + desempenhoQuestionario.getPontuacaoFinal(), Toast.LENGTH_LONG).show();

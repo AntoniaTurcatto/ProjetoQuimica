@@ -14,9 +14,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".TelaFeedbackDetalhada"
+            android:label="@string/title_activity_tela_feedback_detalhada"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".TelaFeedbackActivity"
             android:label="@string/title_activity_tela_feedback"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".VisualizaProgressoActivity"
             android:label="@string/title_activity_visualiza_progresso"

@@ -28,15 +28,17 @@ public class DesempenhoQuestionario implements Serializable {
         this.meuUsuario = meuUsuario;
     }
 
-    public DesempenhoQuestionario(Date data, float pontuacaoFinal, ArrayList<DesempenhoConteudo> listaDesempenhoConteudos) {
+    public DesempenhoQuestionario(Date data, float pontuacaoFinal, ArrayList<DesempenhoConteudo> listaDesempenhoConteudos, Usuario meuUsuario) {
         this.data = data;
         this.pontuacaoFinal = pontuacaoFinal;
         this.listaDesempenhoConteudos = listaDesempenhoConteudos;
+        this.meuUsuario = meuUsuario;
     }
 
-    public DesempenhoQuestionario(Date data, int tipoDesempenho) {
+    public DesempenhoQuestionario(Date data, int tipoDesempenho, Usuario meuUsuario) {
         this.data = data;
         this.tipoDesempenho = tipoDesempenho;
+        this.meuUsuario = meuUsuario;
         this.listaDesempenhoConteudos = new ArrayList<>();
     }
 

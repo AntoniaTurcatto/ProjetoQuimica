@@ -11,22 +11,25 @@ public class DesempenhoConteudo implements Serializable {
     private int quantidadeAcertos;
     private int quantidadeErros;
     private float pontuacaoConteudo;
+    private float mediaAcertosUltimosQuestionarios;
 
-    public DesempenhoConteudo(int idDesempenhoConteudo, Conteudo conteudo, int quantidadePerguntas, int quantidadeAcertos, int quantidadeErros, float pontuacaoConteudo) {
+    public DesempenhoConteudo(int idDesempenhoConteudo, Conteudo conteudo, int quantidadePerguntas, int quantidadeAcertos, int quantidadeErros, float pontuacaoConteudo, float mediaAcertosUltimosQuestionarios) {
         this.idDesempenhoConteudo = idDesempenhoConteudo;
         this.conteudo = conteudo;
         this.quantidadePerguntas = quantidadePerguntas;
         this.quantidadeAcertos = quantidadeAcertos;
         this.quantidadeErros = quantidadeErros;
         this.pontuacaoConteudo = pontuacaoConteudo;
+        this.mediaAcertosUltimosQuestionarios = mediaAcertosUltimosQuestionarios;
     }
 
-    public DesempenhoConteudo(Conteudo conteudo, int quantidadePerguntas, int quantidadeAcertos, int quantidadeErros, float pontuacaoConteudo) {
+    public DesempenhoConteudo(Conteudo conteudo, int quantidadePerguntas, int quantidadeAcertos, int quantidadeErros, float pontuacaoConteudo, float mediaAcertosUltimosQuestionarios) {
         this.conteudo = conteudo;
         this.quantidadePerguntas = quantidadePerguntas;
         this.quantidadeAcertos = quantidadeAcertos;
         this.quantidadeErros = quantidadeErros;
         this.pontuacaoConteudo = pontuacaoConteudo;
+        this.mediaAcertosUltimosQuestionarios = mediaAcertosUltimosQuestionarios;
     }
 
     public Conteudo getConteudo() {
@@ -79,5 +82,13 @@ public class DesempenhoConteudo implements Serializable {
 
     public void setPontuacaoConteudo(float pontuacaoConteudo) {
         this.pontuacaoConteudo = pontuacaoConteudo;
+    }
+
+    public float getMediaAcertosUltimosQuestionarios() {
+        return mediaAcertosUltimosQuestionarios;
+    }
+
+    public void setMediaAcertosUltimosQuestionarios(float mediaAcertosUltimosQuestionarios) {
+        this.mediaAcertosUltimosQuestionarios = mediaAcertosUltimosQuestionarios;
     }
 }

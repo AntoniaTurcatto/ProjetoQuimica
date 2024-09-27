@@ -13,13 +13,20 @@ import com.example.user.projetoquimica.R;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import static com.example.user.componente.NivelConteudoEnum.BRONZE;
 
 public class NivelConteudo implements Serializable {
     private int idNivelConteudo;
     private NivelConteudoEnum nivel;
+    private NivelConteudoEnum nivelAnterior; //0=desceu; 1=subiu; -1=primeiro ranking
+    private Date dataUltimoTeste; //dd/MM/yyyy HH:mm:ss OU -1(caso não exista)
+    private Date dataAtualizacaoNivel; //dd/MM/yyyy HH:mm:ss OU -1(caso não exista)
+    private DesempenhoConteudo ultimoDesempenhoConteudo;
     private Usuario usuario;
     private Conteudo conteudo;
     private Image imagem;
@@ -27,23 +34,69 @@ public class NivelConteudo implements Serializable {
     private int vidas; //PEDRO - adicionei número de vidas restantes, por enquanto é um int, podemos mudar para float no futuro
 
     //construtor 1 - sem id
-    public NivelConteudo(NivelConteudoEnum nivel, Usuario usuario, Conteudo conteudo, int tentativas, int vidas) {
+    public NivelConteudo(NivelConteudoEnum nivel, int subiuOuDesceuNivel, Date dataUltimoTeste, Date dataAtualizacaoNivel, DesempenhoConteudo ultimoDesempenhoConteudo, Usuario usuario, Conteudo conteudo, int tentativas, int vidas) {
         this.idNivelConteudo = -1;
         this.nivel = nivel;
         this.usuario = usuario;
         this.conteudo = conteudo;
         this.tentativas = tentativas;
         this.vidas = vidas;
+        //definindo o nivel anterior
+        if (subiuOuDesceuNivel == 1){ //subiu de nivel
+            switch (nivel.getValor()){
+                case 2: this.nivelAnterior = NivelConteudoEnum.COBRE; //cobre =1 (anterior pois subiu de nivel)
+                case 3: this.nivelAnterior = NivelConteudoEnum.BRONZE;//bronze =2 (anterior pois subiu de nivel)
+                case 4: this.nivelAnterior = NivelConteudoEnum.PRATA; //prata =3 (anterior pois subiu de nivel)
+                case 5: this.nivelAnterior = NivelConteudoEnum.OURO;//ouro =4 (anterior pois subiu de nivel)
+                default: this.nivelAnterior = NivelConteudoEnum.COBRE;
+            }
+        } else if (subiuOuDesceuNivel == -1){ //desceu de nível
+            switch (nivel.getValor()){
+                case 1: this.nivelAnterior = NivelConteudoEnum.BRONZE; //bronze =2 (anterior pois caiu de nivel)
+                case 2: this.nivelAnterior = NivelConteudoEnum.PRATA;//prata =3 (anterior pois caiu de nivel)
+                case 3: this.nivelAnterior = NivelConteudoEnum.OURO; //ouro =4 (anterior pois caiu de nivel)
+                case 4: this.nivelAnterior = NivelConteudoEnum.DIAMANTE;//diamante =5 (anterior pois caiu de nivel)
+                default: this.nivelAnterior = NivelConteudoEnum.COBRE;
+            }
+        } else { //Não tem nível anterior (subiuOuDesceuNivel == 0)
+            this.nivelAnterior = nivel;
+        }
+        this.dataAtualizacaoNivel = dataAtualizacaoNivel;
+        this.dataUltimoTeste = dataUltimoTeste;
+        this.ultimoDesempenhoConteudo = ultimoDesempenhoConteudo;
     }
 
     //construtor 2 - com id
-    public NivelConteudo(int idNivelConteudo, NivelConteudoEnum nivel, Usuario usuario, Conteudo conteudo, int tentativas, int vidas) {
+    public NivelConteudo(int idNivelConteudo, NivelConteudoEnum nivel, int subiuOuDesceuNivel, Date dataUltimoTeste, Date dataAtualizacaoNivel, DesempenhoConteudo ultimoDesempenhoConteudo, Usuario usuario, Conteudo conteudo, int tentativas, int vidas) {
         this.idNivelConteudo = idNivelConteudo;
         this.nivel = nivel;
         this.usuario = usuario;
         this.conteudo = conteudo;
         this.tentativas = tentativas;
         this.vidas = vidas;
+        this.ultimoDesempenhoConteudo = ultimoDesempenhoConteudo;
+
+        if (subiuOuDesceuNivel == 1){ //subiu de nivel
+            switch (nivel.getValor()){
+                case 2: this.nivelAnterior = NivelConteudoEnum.COBRE; //cobre =1 (anterior pois subiu de nivel)
+                case 3: this.nivelAnterior = NivelConteudoEnum.BRONZE;//bronze =2 (anterior pois subiu de nivel)
+                case 4: this.nivelAnterior = NivelConteudoEnum.PRATA; //prata =3 (anterior pois subiu de nivel)
+                case 5: this.nivelAnterior = NivelConteudoEnum.OURO;//ouro =4 (anterior pois subiu de nivel)
+                default: this.nivelAnterior = NivelConteudoEnum.COBRE;
+            }
+        } else if (subiuOuDesceuNivel == -1){ //desceu de nível
+            switch (nivel.getValor()){
+                case 1: this.nivelAnterior = NivelConteudoEnum.BRONZE; //bronze =2 (anterior pois caiu de nivel)
+                case 2: this.nivelAnterior = NivelConteudoEnum.PRATA;//prata =3 (anterior pois caiu de nivel)
+                case 3: this.nivelAnterior = NivelConteudoEnum.OURO; //ouro =4 (anterior pois caiu de nivel)
+                case 4: this.nivelAnterior = NivelConteudoEnum.DIAMANTE;//diamante =5 (anterior pois caiu de nivel)
+                default: this.nivelAnterior = NivelConteudoEnum.COBRE;
+            }
+        } else { //Não tem nível anterior (subiuOuDesceuNivel == 0)
+            this.nivelAnterior = nivel;
+        }
+        this.dataAtualizacaoNivel = dataAtualizacaoNivel;
+        this.dataUltimoTeste = dataUltimoTeste;
     }
 
     public NivelConteudo(NivelConteudoEnum nivel, Conteudo conteudo, Image imagem) {
@@ -59,6 +112,7 @@ public class NivelConteudo implements Serializable {
         int retorno = -1;
         NivelConteudoEnum novoNivel = obtemIncrementoUmNivel();
         if (this.nivel != NivelConteudoEnum.DIAMANTE){
+            this.nivelAnterior= nivel;
             this.nivel = novoNivel;
             retorno = 1;
         } else {
@@ -71,6 +125,7 @@ public class NivelConteudo implements Serializable {
         int retorno =-1;
         NivelConteudoEnum novoNivel = obtemDecaiUmNivel();
         if (this.nivel != NivelConteudoEnum.COBRE){
+            this.nivelAnterior= nivel;
             this.nivel = novoNivel;
             retorno = 1;
         } else {
@@ -277,6 +332,64 @@ public class NivelConteudo implements Serializable {
 
     public void setVidas(int vidas) {
         this.vidas = vidas;
+    }
+
+    public Date getDataUltimoTeste() {
+        return dataUltimoTeste;
+    }
+
+    public void setDataUltimoTeste(String dataUltimoTeste) {
+        //definindo a data conforme a string
+        try {
+            if (!dataUltimoTeste.equals("")){
+                this.dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataUltimoTeste);
+            } else {
+                this.dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+            }
+        } catch(ParseException parse) {
+            parse.printStackTrace();
+        }
+    }
+
+    public void setDataUltimoTeste(Date dataUltimoTeste) {
+        this.dataUltimoTeste = dataUltimoTeste;
+    }
+
+    public Date getDataAtualizacaoNivel() {
+        return dataAtualizacaoNivel;
+    }
+
+    public void setDataAtualizacaoNivel(String dataAtualizacaoNivel) {
+        //definindo a data conforme a string
+        try {
+            if (!dataAtualizacaoNivel.equals("")){
+                this.dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataAtualizacaoNivel);
+            } else {
+                this.dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+            }
+        } catch(ParseException parse) {
+            parse.printStackTrace();
+        }
+    }
+
+    public void setDataAtualizacaoNivel(Date dataAtualizacaoNivel) {
+        this.dataAtualizacaoNivel = dataAtualizacaoNivel;
+    }
+
+    public NivelConteudoEnum getNivelAnterior() {
+        return nivelAnterior;
+    }
+
+    public void setNivelAnterior(NivelConteudoEnum nivelAnterior) {
+        this.nivelAnterior = nivelAnterior;
+    }
+
+    public DesempenhoConteudo getUltimoDesempenhoConteudo() {
+        return ultimoDesempenhoConteudo;
+    }
+
+    public void setUltimoDesempenhoConteudo(DesempenhoConteudo ultimoDesempenhoConteudo) {
+        this.ultimoDesempenhoConteudo = ultimoDesempenhoConteudo;
     }
 }
 

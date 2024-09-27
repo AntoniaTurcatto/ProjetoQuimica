@@ -54,6 +54,12 @@
                 android:text="Gráfico Niveis Por Conteudo"
                 android:id="@+id/bGraficoNiveisPorConteudo"/>
 
+            <Button
+                android:id="@+id/bFeedbackMenuCadastro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Feedback"/>
+
 <!--     Seria mais uma listagem de Vidas e tentativas anteriores-->
 
 

@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.user.banco.ConteudoDB;
 import com.example.user.banco.InformacoesApp;
+import com.example.user.classesDominio.ClasseIntermediaria;
 import com.example.user.classesDominio.Conteudo;
 
 public class EntradaDeConteudosActivity extends AppCompatActivity{
@@ -22,7 +23,8 @@ public class EntradaDeConteudosActivity extends AppCompatActivity{
     Button bSalvarConteudo, bCancelarConteudo;
     InformacoesApp informacoesApp;
 
-    ConteudoDB conteudoDB;
+    //ConteudoDB conteudoDB;
+    ClasseIntermediaria classeIntermediaria;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +38,8 @@ public class EntradaDeConteudosActivity extends AppCompatActivity{
         bCancelarConteudo = findViewById(R.id.bCancelarConteudo);
         informacoesApp = (InformacoesApp)getApplicationContext();
 
-        conteudoDB = new ConteudoDB(getApplicationContext());
+        //conteudoDB = new ConteudoDB(getApplicationContext());
+        classeIntermediaria = new ClasseIntermediaria(getApplicationContext());
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -55,9 +58,10 @@ public class EntradaDeConteudosActivity extends AppCompatActivity{
                     Conteudo meuConteudo = new Conteudo(nomeConteudo, informacoesApp.getTipoConteudo());
                     Log.d("Teste", "Tipo do conteudo: " + informacoesApp.getTipoConteudo());
 
-                    String retornoConteudo = conteudoDB.insereConteudo(meuConteudo);
+                    String[] retornoConteudo = classeIntermediaria.insereConteudoComNivelConteudoInicial(meuConteudo, informacoesApp.getMeuUsuario());
                     limpaCampos();
-                    Toast.makeText(EntradaDeConteudosActivity.this, retornoConteudo, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EntradaDeConteudosActivity.this, retornoConteudo[0], Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EntradaDeConteudosActivity.this, retornoConteudo[1], Toast.LENGTH_SHORT).show();
                 } else {
                     etNomeConteudo.setError("Informe o nome do conteúdo");
                     etNomeConteudo.requestFocus();

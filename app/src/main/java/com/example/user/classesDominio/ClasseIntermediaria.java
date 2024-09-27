@@ -1,19 +1,28 @@
 package com.example.user.classesDominio;
 
 import android.content.Context;
+import android.icu.util.DateInterval;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.user.banco.Conexao;
+import com.example.user.banco.ConteudoDB;
 import com.example.user.banco.DesempenhoConteudoDB;
 import com.example.user.banco.NivelConteudoDB;
 import com.example.user.banco.PerguntaDB;
 import com.example.user.componente.NivelConteudoEnum;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ClasseIntermediaria {
     Context context;
@@ -88,7 +97,7 @@ public class ClasseIntermediaria {
         Date dataAtual = new Date(System.currentTimeMillis());
         Log.d("Teste", "data = " + dataAtual);
         DesempenhoQuestionario desempenhoQuestionario = new DesempenhoQuestionario
-                (dataAtual, 1); //recebe 1 no tipo desempenho pois é um quiz
+                (dataAtual, 1, meuUsuario); //recebe 1 no tipo desempenho pois é um quiz
 
         int inicio = 0;
 
@@ -96,7 +105,8 @@ public class ClasseIntermediaria {
         for (int indice = 0; indice < listaNivelConteudos.size(); indice++) {
             // obtendo o nivel conteudo
             NivelConteudo meuNivelConteudo = listaNivelConteudos.get(indice);
-
+            //definindo a data do último quiz/teste realizado (esse)
+            meuNivelConteudo.setDataUltimoTeste(desempenhoQuestionario.getData());
             // definindo os valores de faceis, medias e dificeis de acordo com o nível que o usuário está
             float valorFaceis = 0;
             float valorMedias = 0;
@@ -197,14 +207,29 @@ public class ClasseIntermediaria {
             // atualizando o novo início
             inicio = fim;
 
-            DesempenhoConteudo desempenhoConteudo = new DesempenhoConteudo(meuNivelConteudo.getConteudo(), quantidadePerguntasPorConteudo[indice][0], acertos, erros, pontuacaoConteudo);
+            DesempenhoConteudoDB desempenhoConteudoDB = new DesempenhoConteudoDB(context);
 
+            //divide a soma de todos os acertos em um conteúdo, nos últimos 3 questionários,
+            // e divide pela quantidade de perguntas que esse conteúdo teve nesses questionários.
+            ArrayList<DesempenhoConteudo> listaUltimos3DesempenhosConteudos = desempenhoConteudoDB.buscaUltimos3DesempenhosConteudosComConteudo(meuNivelConteudo.getConteudo().getIdConteudo());
+            float mediaAcertosUltimos3 = 0.0f;
+            if (listaUltimos3DesempenhosConteudos.size()>=3){
+                mediaAcertosUltimos3 = (float)acertos + (float)listaUltimos3DesempenhosConteudos.get(0).getQuantidadeAcertos() + (float)listaUltimos3DesempenhosConteudos.get(1).getQuantidadeAcertos()
+                        /(quantidadePerguntasPorConteudo[indice][0] + listaUltimos3DesempenhosConteudos.get(0).getQuantidadePerguntas() + listaUltimos3DesempenhosConteudos.get(1).getQuantidadePerguntas());
+
+            }
+
+            DesempenhoConteudo desempenhoConteudo = new DesempenhoConteudo(meuNivelConteudo.getConteudo(), quantidadePerguntasPorConteudo[indice][0], acertos, erros, pontuacaoConteudo,mediaAcertosUltimos3);
+            desempenhoConteudoDB.insereDesempenhoConteudo(desempenhoConteudo);
+            meuNivelConteudo.setUltimoDesempenhoConteudo(desempenhoConteudo);
+            //nivelConteudoDB.atualizaDesempenhoConteudo(meuNivelConteudo, meuUsuario);
             // adicionando no desempenho do questionário
             desempenhoQuestionario.getListaDesempenhoConteudos().add(desempenhoConteudo);
 
             // reiniciando os acertos e erros
             acertos = 0;
             erros = 0;
+            //mediaAcertosUltimos3 = 0f;
 
             // verificando se pontuação conteúdo fez com que devesse pular de nível
             Log.d("Teste", "Nível antigo: " + meuNivelConteudo.getNivel());
@@ -224,6 +249,7 @@ public class ClasseIntermediaria {
                     if (retorno == -1) {
                         Toast.makeText(context, "Erro ao atualizar nível!", Toast.LENGTH_SHORT).show();
                     } else if (retorno == 1) {
+                        meuNivelConteudo.setDataAtualizacaoNivel(desempenhoQuestionario.getData());
                         listaNivelConteudoParaAtualizar.add(meuNivelConteudo);
                         Toast.makeText(context, "Parabéns!!! Você pulou no conteúdo: " + meuNivelConteudo.getConteudo().getNomeConteudo() + " para o nível: " + meuNivelConteudo.getNivel(), Toast.LENGTH_SHORT).show();
                         meuNivelConteudo.setTentativas(0);
@@ -278,6 +304,8 @@ public class ClasseIntermediaria {
                     if (retorno == -1){
                         Toast.makeText(context, "Erro ao atualizar o nível!", Toast.LENGTH_SHORT).show();
                     } else if ( retorno == 1){
+                        meuNivelConteudo.setDataAtualizacaoNivel(desempenhoQuestionario.getData());
+
                         listaNivelConteudoParaDecair.add(meuNivelConteudo);
                         Toast.makeText(context, "Que pena, infelizmente você decaiu no conteúdo: " + meuNivelConteudo.getConteudo().getNomeConteudo() + " para o nível: " + meuNivelConteudo.getNivel()+" seu número de vidas foi restaurado", Toast.LENGTH_SHORT).show();
                     } else {
@@ -296,6 +324,7 @@ public class ClasseIntermediaria {
             //PEDRO - Atualizando o número de vidas no banco
             nivelConteudoDB.atualizaVidas(meuNivelConteudo, meuUsuario);
 
+
             Log.d("Teste", "Nível novo: " + meuNivelConteudo.getNivel());
 
             Log.d("Tentativas","Tentativas Atualiza: " + meuNivelConteudo.getTentativas());
@@ -304,15 +333,21 @@ public class ClasseIntermediaria {
 
         }
 
+        //atualizando datas de todos os nivelConteudo
+        NivelConteudoDB nivelConteudoDB = new NivelConteudoDB(context);
+        nivelConteudoDB.atualizaDatas(listaNivelConteudos, meuUsuario);
+
         // verificando se existem conteúdos a serem atualizados os níveis no banco
         if (listaNivelConteudoParaAtualizar.size() > 0) {
-            NivelConteudoDB nivelConteudoDB = new NivelConteudoDB(this.context);
+
             nivelConteudoDB.incrementaNivel(listaNivelConteudoParaAtualizar, meuUsuario);
         }
         if (listaNivelConteudoParaDecair.size() > 0){
-            NivelConteudoDB nivelConteudoDB = new NivelConteudoDB(this.context);
+
             nivelConteudoDB.decaiNivel(listaNivelConteudoParaDecair, meuUsuario);
         }
+
+        nivelConteudoDB.atualizaDesempenhoConteudo(listaNivelConteudos, desempenhoQuestionario);
         return desempenhoQuestionario;
     }
 
@@ -374,7 +409,7 @@ public class ClasseIntermediaria {
         Date dataAtual = new Date(System.currentTimeMillis());
         Log.d("Teste", "data = " + dataAtual);
         DesempenhoQuestionario desempenhoQuestionario = new DesempenhoQuestionario
-                (dataAtual, 2); // recebe 2 no tipo desempenho pois é um diagnóstico
+                (dataAtual, 2, meuUsuario); // recebe 2 no tipo desempenho pois é um diagnóstico
 
         int inicio = 0;
 
@@ -440,9 +475,21 @@ public class ClasseIntermediaria {
             // atualizando o novo início
             inicio = fim;
 
-            DesempenhoConteudo desempenhoConteudo = new DesempenhoConteudo(meuNivelConteudo.getConteudo(), quantidadePerguntasPorConteudo[indice][0], acertos, erros, pontuacaoConteudo);
+            DesempenhoConteudoDB desempenhoConteudoDB = new DesempenhoConteudoDB(context);
+
+            //divide a soma de todos os acertos em um conteúdo, nos últimos 3 questionários,
+            // e divide pela quantidade de perguntas que esse conteúdo teve nesses questionários.
+            ArrayList<DesempenhoConteudo> listaUltimos3DesempenhosConteudos = desempenhoConteudoDB.buscaUltimos3DesempenhosConteudosComConteudo(meuNivelConteudo.getConteudo().getIdConteudo());
+            float mediaAcertosUltimos3 = 0.0f;
+            if (listaUltimos3DesempenhosConteudos.size()>=3){
+                mediaAcertosUltimos3 = (float)acertos + (float)listaUltimos3DesempenhosConteudos.get(0).getQuantidadeAcertos() + (float)listaUltimos3DesempenhosConteudos.get(1).getQuantidadeAcertos()
+                        /(quantidadePerguntasPorConteudo[indice][0] + listaUltimos3DesempenhosConteudos.get(0).getQuantidadePerguntas() + listaUltimos3DesempenhosConteudos.get(1).getQuantidadePerguntas());
+
+            }
+            DesempenhoConteudo desempenhoConteudo = new DesempenhoConteudo(meuNivelConteudo.getConteudo(), quantidadePerguntasPorConteudo[indice][0], acertos, erros, pontuacaoConteudo,mediaAcertosUltimos3);
 
             // adicionando no desempenho do questionário
+            meuNivelConteudo.setUltimoDesempenhoConteudo(desempenhoConteudo);
             desempenhoQuestionario.getListaDesempenhoConteudos().add(desempenhoConteudo);
 
             // reiniciando os acertos e erros
@@ -488,6 +535,11 @@ public class ClasseIntermediaria {
             Log.d("Teste", "Nível novo: " + meuNivelConteudo.getNivel());
         }
 
+        //atualizando datas de todos os nivelConteudo
+        NivelConteudoDB nivelConteudoDB = new NivelConteudoDB(context);
+        nivelConteudoDB.atualizaDatas(listaNivelConteudos, meuUsuario);
+        nivelConteudoDB.atualizaDesempenhoConteudo(listaNivelConteudos, desempenhoQuestionario);
+
         return desempenhoQuestionario;
     }
 
@@ -495,31 +547,376 @@ public class ClasseIntermediaria {
         //LOGICA DA EXPLICAÇÃO:======================================================================================
         //coisas necessárias:
         /*
-        ranking atual .................................................................................(int para identificar)
-        ranking anterior (detectar progresso ou regresso)..............................................(int para identificar)
-        taxa de acerto dos últimos 5 questionários (média) (ou menos caso não tenham suficientem)......(float (0.0 a 1.0))
+        ranking atual .................................................................................(NivelConteudoEnum)
+        ranking anterior (detectar progresso ou regresso)..............................................(NivelConteudoEnum)
+        taxa de acerto dos últimos 3 questionários (média) (ou menos caso não tenham suficientem)......(float (0.0 a 1.0))
         taxa de acerto último questionário.............................................................(float (0.0 a 1.0))
+        ultimoDesempenhoConteudo.......................................................................(DesempenhoConteudo)
+        data de ultimo teste/questionario..............................................................(Date)
+        data ultima atualizacao de nível...............................................................(Date)
+        dataAtual......................................................................................(Date)
         */
         NivelConteudoDB nivelConteudoDB = new NivelConteudoDB(context);
         DesempenhoConteudoDB desempenhoConteudoDB = new DesempenhoConteudoDB(context);
         ArrayList<String> listaExplicacoes = new ArrayList<>();
 
+        Date dataHoje = new Date(System.currentTimeMillis());
+
         ArrayList<NivelConteudo> listaNivelConteudo = nivelConteudoDB.buscaConteudosComNivel(listaConteudos, usuario);
 
-        for (int i = 0; i < listaConteudos.size(); i++){
-            int rankingAtual;
-            int rankingAnterior;
-            float taxaDeAcertosUltimosCinco;
-            float taxaDeAcertosUltimo;
+        for (int i = 0; i < listaNivelConteudo.size(); i++){
+            String explicacaoDesempenho;
+            NivelConteudoEnum rankingAtual; //FEITO
+            NivelConteudoEnum rankingAnterior; //FEITO
+            float taxaDeAcertosUltimosTres; //FEITO
+            float taxaDeAcertosUltimo; //FEITO
+            Date dataUltimoTeste; //FEITO
+            Date dataUltimaAtualizacaoNivel; //FEITO
+
+            DesempenhoConteudo ultimoDesempenhoConteudo = desempenhoConteudoDB.buscaDesempenhoConteudoComConteudo(listaNivelConteudo.get(i).getConteudo().getIdConteudo());
 
             //calculando o ranking atual e anterior
-            rankingAtual = listaNivelConteudo.get(i).getNivel().getValor();
-            rankingAnterior = listaNivelConteudo.get(i).getNivelAnterior().getValor();
+            rankingAtual = listaNivelConteudo.get(i).getNivel();
+            rankingAnterior = listaNivelConteudo.get(i).getNivelAnterior();
+            if (ultimoDesempenhoConteudo != null){
+                taxaDeAcertosUltimosTres = ultimoDesempenhoConteudo.getMediaAcertosUltimosQuestionarios();
+                taxaDeAcertosUltimo = ultimoDesempenhoConteudo.getQuantidadeAcertos()/ultimoDesempenhoConteudo.getQuantidadePerguntas();
+                dataUltimoTeste = listaNivelConteudo.get(i).getDataUltimoTeste();
+                dataUltimaAtualizacaoNivel = listaNivelConteudo.get(i).getDataAtualizacaoNivel();
+
+                //tempo entre o último teste e o dia atual
+                long diffInMilliesDesdeUltimoTeste = Math.abs(dataUltimoTeste.getTime() - dataHoje.getTime());
+                long diffUltimoTeste = TimeUnit.DAYS.convert(diffInMilliesDesdeUltimoTeste, TimeUnit.MILLISECONDS);
+
+                long diffInMilliesDesdeUltimaAtualizacaoNivel = Math.abs(dataUltimoTeste.getTime() - dataHoje.getTime());
+                long diffUltimaAtualizacaoNivel = TimeUnit.DAYS.convert(diffInMilliesDesdeUltimaAtualizacaoNivel, TimeUnit.MILLISECONDS);
+
+                Log.d("dataHoje", dataHoje.toString());
+                Log.d("dataUltimoTeste", dataUltimoTeste.toString());
+                Log.d("dataUltimoMudaRank", dataUltimaAtualizacaoNivel.toString());
+
+                Log.d("Dias desde o ultimoTest", String.valueOf(diffUltimoTeste));
+                Log.d("DiasDesdeUltimaMudaRank", String.valueOf(diffUltimaAtualizacaoNivel));
+                if (rankingAtual.getValor() > rankingAnterior.getValor()){ // IF FINALIZADO
+                    if (rankingAtual.getValor() - 2 == rankingAnterior.getValor()){//avançou 2 níveis (diagnóstico)
+                        if (taxaDeAcertosUltimo > taxaDeAcertosUltimosTres){
+                            if (diffUltimoTeste < 7){
+                                if (diffUltimaAtualizacaoNivel<7){
+                                    //rank melhor que último, taxa de acertos subindo
+                                    //fez questionario nessa semana e subiu de ranking essa semana
+                                    explicacaoDesempenho = "Parabéns, Seus esforços estão rendendo!"
+                                            +" Seu desempenho no conteúdo "+listaNivelConteudo.get(i).getConteudo().getNomeConteudo()+" apresenta uma significativa evolução e"
+                                            +" comprometimento com o aprendizado. Você subiu do ranking "+rankingAnterior.toString()
+                                            +" para o "+rankingAtual.toString()
+                                            +" essa semana através de diagnóstico, se desafiando em conteúdo mais difíceis!"
+                                            +" Para fixar o novo conteúdo estude e continue se exercitando. Continue assim!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                } else {
+                                    //rank melhor que último, taxa de acertos subindo
+                                    //fez questionario nessa semana e subiu de ranking há mais de uma semana
+                                    explicacaoDesempenho = "Seu desempenho em "+listaNivelConteudo.get(i).getConteudo().getNomeConteudo()
+                                            +" constata que você apresenta uma constante evolução nas taxas de acerto, mesmo após avançar dois níveis de uma vez,"
+                                            +" podendo subir de ranking novamente"
+                                            +" a qualquer momento. Continue aprendendo e se exercitando!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                }
+                            } else {
+                                if (diffUltimaAtualizacaoNivel<7){
+                                    //rank melhor que último, taxa de acertos subindo
+                                    //fez questionario há mais de uma semana e subiu de ranking nessa semana
+                                    explicacaoDesempenho = "A sua evolução no ranking e taxa de acertos indicam que você" +
+                                            " apresenta evolução nos conhecimentos, mesmo após a difícil tarefa de subir de ranking em um diagnóstico."+
+                                            " Porém, o estudo precisa de prática constante para não se esquecer dos conteúdos e você," +
+                                            " mesmo que tenha subido de ranking nessa semana," +
+                                            " não realizou nem um teste nela. Isso pode ser bom, pausas são importantes, mas não deixe de praticar" +
+                                            " por medo de baixar as sua estatísticas. O importante não é o ranking, mas o conhecimento que você adquiriu."+
+                                            " Não deixe de praticar!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                } else {
+                                    //rank melhor que último, taxa de acertos subindo
+                                    //fez questionario há mais de uma semana e subiu de ranking há mais de uma semana
+                                    explicacaoDesempenho = "A sua evolução no ranking e taxa de acertos indicam que você" +
+                                            " apresenta evolução nos conhecimentos, mesmo após a difícil tarefa de subir de ranking em um diagnóstico."+
+                                            " Porém, o estudo precisa de prática constante para não se esquecer dos conteúdos e você não realizou" +
+                                            " nem um teste ou subiu de ranking essa semana. Isso pode ser bom, pausas são importantes, mas não deixe de praticar" +
+                                            " por medo de baixar as sua estatísticas. O importante não é o ranking, mas o conhecimento que você adquiriu."+
+                                            " Não deixe de praticar!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                }
+                            }
+                        } else {
+                            if (diffUltimoTeste < 7){
+                                if (diffUltimaAtualizacaoNivel<7){
+                                    //rank melhor que último, taxa de acertos igual ou decaindo
+                                    //fez questionario nessa semana e subiu de ranking nessa semana
+                                    explicacaoDesempenho = "De acordo com sua taxa de acertos," +
+                                            " você encontrou uma certa dificuldade no novo ranking que você conseguiu essa semana, o que pode" +
+                                            " acontecer após um diagnóstico. Para continuar nesse nível, estude um pouco mais e continue praticando. Você consegue!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                } else {
+                                    //rank melhor que último, taxa de acertos igual ou decaindo
+                                    //fez questionario nessa semana e subiu de ranking há mais de uma semana
+                                    explicacaoDesempenho = "De acordo com sua taxa de acertos," +
+                                            " você encontrou uma certa dificuldade no seu ranking, o que pode" +
+                                            " acontecer após um diagnóstico. Para continuar nesse nível, estude um pouco mais e continue praticando. Você consegue!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                }
+                            } else {
+                                if (diffUltimaAtualizacaoNivel<7){
+                                    //rank melhor que último, taxa de acertos igual ou decaindo
+                                    //fez questionario há mais de uma semana e subiu de ranking nessa semana
+                                    explicacaoDesempenho = "Você subiu de ranking essa semana através de um diagnóstico, porém não pratica há mais de uma e apresenta certa dificuldade no novo ranking."+
+                                            " Para o conhecimento se consolidar, é necessário a prática. Volte a praticar para fixar o conteúdo, você consegue!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                } else {
+                                    //rank melhor que último, taxa de acertos igual ou decaindo
+                                    //fez questionario há mais de uma semana e subiu de ranking há mais de uma semana
+                                    explicacaoDesempenho = "Não se desanime! Estudar é uma tarefa difícil e tudo bem" +
+                                            " fazer uma pausa, mas não abandone essa atividade. Você apresenta dificuldade no conteúdo," +
+                                            " porém isso não quer dizer que você não seja capaz de aprendê-lo. Continue estudando, sem medo de errar,"+
+                                            " que alguma hora você passa a entender melhor o conteúdo!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                }
+                            }
+                        }
+                    } else {//avançou 1 níveis (questionário)
+                        if (taxaDeAcertosUltimo > taxaDeAcertosUltimosTres){
+                            if (diffUltimoTeste < 7){
+                                if (diffUltimaAtualizacaoNivel<7){
+                                    //rank melhor que último, taxa de acertos subindo
+                                    //fez questionario nessa semana e subiu de ranking essa semana
+                                    explicacaoDesempenho = "Parabéns, Seus esforços estão rendendo!"
+                                            +" Seu desempenho no conteúdo "+listaNivelConteudo.get(i).getConteudo().getNomeConteudo()+" apresenta uma significativa evolução e"
+                                            +" comprometimento com o aprendizado. Você subiu do ranking "+rankingAnterior.toString()
+                                            +" para o "+rankingAtual.toString()
+                                            +" essa semana, dominando o conteúdo anterior!"
+                                            +" Para fixar o novo conteúdo estude e continue se exercitando. Continue assim!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                } else {
+                                    //rank melhor que último, taxa de acertos subindo
+                                    //fez questionario nessa semana e subiu de ranking há mais de uma semana
+                                    explicacaoDesempenho = "Seu desempenho em "+listaNivelConteudo.get(i).getConteudo().getNomeConteudo()
+                                            +" constata que você apresenta uma constante evolução nas taxas de acerto,"
+                                            +" podendo subir de ranking novamente"
+                                            +" a qualquer momento. Continue aprendendo e se exercitando!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                }
+                            } else {
+                                if (diffUltimaAtualizacaoNivel<7){
+                                    //rank melhor que último, taxa de acertos subindo
+                                    //fez questionario há mais de uma semana e subiu de ranking nessa semana
+                                    explicacaoDesempenho = "A sua evolução no ranking e taxa de acertos indicam que você" +
+                                            " apresenta evolução nos conhecimentos."+
+                                            " Porém, o estudo precisa de prática constante para não se esquecer dos conteúdos e você," +
+                                            " mesmo que tenha subido de ranking nessa semana," +
+                                            " não realizou nem um teste nela. Isso pode ser bom, pausas são importantes, mas não deixe de praticar" +
+                                            " por medo de baixar as sua estatísticas. O importante não é o ranking, mas o conhecimento que você adquiriu."+
+                                            " Não deixe de praticar!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                } else {
+                                    //rank melhor que último, taxa de acertos subindo
+                                    //fez questionario há mais de uma semana e subiu de ranking há mais de uma semana
+                                    explicacaoDesempenho = "A sua evolução no ranking e taxa de acertos indicam que você" +
+                                            " apresenta evolução nos conhecimentos."+
+                                            " Porém, o estudo precisa de prática constante para não se esquecer dos conteúdos e você não realizou" +
+                                            " nem um teste ou subiu de ranking essa semana. Isso pode ser bom, pausas são importantes, mas não deixe de praticar" +
+                                            " por medo de baixar as sua estatísticas. O importante não é o ranking, mas o conhecimento que você adquiriu."+
+                                            " Não deixe de praticar!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                }
+                            }
+                        } else {
+                            if (diffUltimoTeste < 7){
+                                if (diffUltimaAtualizacaoNivel<7){
+                                    //rank melhor que último, taxa de acertos igual ou decaindo
+                                    //fez questionario nessa semana e subiu de ranking nessa semana
+                                    explicacaoDesempenho = "De acordo com sua taxa de acertos," +
+                                            " você encontrou uma certa dificuldade no novo ranking que você conseguiu essa semana." +
+                                            " Para continuar nesse nível, estude um pouco mais e continue praticando. Você consegue!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                } else {
+                                    //rank melhor que último, taxa de acertos igual ou decaindo
+                                    //fez questionario nessa semana e subiu de ranking há mais de uma semana
+                                    explicacaoDesempenho = "De acordo com sua taxa de acertos," +
+                                            " você encontrou uma certa dificuldade no seu ranking." +
+                                            " Para continuar nesse nível, estude um pouco mais e continue praticando. Você consegue!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                }
+                            } else {
+                                if (diffUltimaAtualizacaoNivel<7){
+                                    //rank melhor que último, taxa de acertos igual ou decaindo
+                                    //fez questionario há mais de uma semana e subiu de ranking nessa semana
+                                    explicacaoDesempenho = "Você subiu de ranking essa semana, porém não pratica há mais de uma e apresenta certa dificuldade no novo ranking."+
+                                            " Para o conhecimento se consolidar, é necessário a prática. Volte a praticar para fixar o conteúdo, você consegue!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                } else {
+                                    //rank melhor que último, taxa de acertos igual ou decaindo
+                                    //fez questionario há mais de uma semana e subiu de ranking há mais de uma semana
+                                    explicacaoDesempenho = "Não se desanime! Estudar é uma tarefa difícil e tudo bem" +
+                                            " fazer uma pausa, mas não abandone essa atividade. Você apresenta dificuldade no conteúdo," +
+                                            " porém isso não quer dizer que você não seja capaz de aprendê-lo. Continue estudando, sem medo de errar,"+
+                                            " que alguma hora você passa a entender melhor o conteúdo!";
+                                    listaExplicacoes.add(explicacaoDesempenho);
+                                }
+                            }
+                        }
+                    }
+
+                } else if (rankingAtual.getValor() < rankingAnterior.getValor()){
+                    if (taxaDeAcertosUltimo > taxaDeAcertosUltimosTres){
+                        if (diffUltimoTeste < 7){
+                            if (diffUltimaAtualizacaoNivel<7){
+                                //rank menor que último, taxa de acertos subindo
+                                //fez questionario nessa semana e subiu de ranking essa semana
+                                explicacaoDesempenho = "Parabéns, Você está evoluindo!"
+                                        +" Seu desempenho no conteúdo "+listaNivelConteudo.get(i).getConteudo().getNomeConteudo()+" apresenta uma significativa evolução e"
+                                        +" comprometimento com o aprendizado. Mesmo caindo de ranking essa semana, sua taxa de acertos e prática constante lhe farão aprender ainda mais"
+                                        +" As vezes é necessário dar um passo para trás, para dar dois para frente. Continue Assim!";
+                                listaExplicacoes.add(explicacaoDesempenho);
+                            } else {
+                                //rank menor que último, taxa de acertos subindo
+                                //fez questionario nessa semana e subiu de ranking há mais de uma semana
+                                explicacaoDesempenho = "Seu desempenho em "+listaNivelConteudo.get(i).getConteudo().getNomeConteudo()
+                                        +" constata que você apresenta uma constante evolução nas taxas de acerto,"
+                                        +" podendo subir de ranking novamente!"
+                                        +" a qualquer momento. Continue aprendendo e se exercitando!";
+                                listaExplicacoes.add(explicacaoDesempenho);
+                            }
+                        } else {
+                            if (diffUltimaAtualizacaoNivel<7){
+                                //rank menor que último, taxa de acertos subindo
+                                //fez questionario há mais de uma semana e subiu de ranking nessa semana
+                                explicacaoDesempenho =  "Mesmo que o seu ranking tenha caído recentemente, a sua taxa de acertos indica que você" +
+                                        " apresenta evolução nos conhecimentos."+
+                                        " Porém, o estudo precisa de prática constante para não se esquecer dos conteúdos e você não realizou" +
+                                        " nem um teste. Isso pode ser bom, pausas são importantes, mas não deixe de praticar" +
+                                        " por medo de baixar as sua estatísticas. O importante não é o ranking, mas o conhecimento que você adquiriu."+
+                                        " Não deixe de praticar!";
+                                listaExplicacoes.add(explicacaoDesempenho);
+                            } else {
+                                //rank menor que último, taxa de acertos subindo
+                                //fez questionario há mais de uma semana e subiu de ranking há mais de uma semana
+                                explicacaoDesempenho = "Mesmo que o seu ranking tenha caído, a sua taxa de acertos indica que você" +
+                                        " apresenta evolução nos conhecimentos."+
+                                        " Porém, o estudo precisa de prática constante para não se esquecer dos conteúdos e você não realizou" +
+                                        " nem um teste. Isso pode ser bom, pausas são importantes, mas não deixe de praticar" +
+                                        " por medo de baixar as sua estatísticas. O importante não é o ranking, mas o conhecimento que você adquiriu."+
+                                        " Não deixe de praticar!";
+                                listaExplicacoes.add(explicacaoDesempenho);
+                            }
+                        }
+                    } else {
+                        if (diffUltimoTeste < 7){
+                            if (diffUltimaAtualizacaoNivel<7){
+                                //rank menor que último, taxa de acertos igual ou decaindo
+                                //fez questionario nessa semana e subiu de ranking nessa semana
+                                explicacaoDesempenho = "De acordo com sua taxa de acertos," +
+                                        " você encontrou uma certa dificuldade no ranking após voltar a ele essa semana." +
+                                        " Para continuar nesse nível, mantenha a calma, estude um pouco mais e continue praticando. Você consegue!";
+                                listaExplicacoes.add(explicacaoDesempenho);
+                            } else {
+                                //rank menor que último, taxa de acertos igual ou decaindo
+                                //fez questionario nessa semana e subiu de ranking há mais de uma semana
+                                explicacaoDesempenho = "De acordo com sua taxa de acertos," +
+                                        " você encontrou uma certa dificuldade no ranking atual." +
+                                        " Para continuar nesse nível, mantenha a calma, estude um pouco mais e continue praticando. Você consegue!";
+                                listaExplicacoes.add(explicacaoDesempenho);
+                            }
+                        } else {
+                            if (diffUltimaAtualizacaoNivel<7){
+                                //rank menor que último, taxa de acertos igual ou decaindo
+                                //fez questionario há mais de uma semana e subiu de ranking nessa semana
+                                explicacaoDesempenho = "Você não pratica há mais de uma e apresenta certa dificuldade no ranking cujo você voltou essa semana."+
+                                        " Para o conhecimento se consolidar, é necessário a prática. Volte a praticar para fixar o conhecimento, você consegue! Essa é uma oportunidade para aprender melhor esse conteúdo.";
+                                listaExplicacoes.add(explicacaoDesempenho);
+                            } else {
+                                //rank menor que último, taxa de acertos igual ou decaindo
+                                //fez questionario há mais de uma semana e subiu de ranking há mais de uma semana
+                                explicacaoDesempenho = "Não se desanime! Estudar é uma tarefa difícil e tudo bem" +
+                                        " fazer uma pausa, mas não abandone essa atividade. Você apresenta dificuldade no conteúdo," +
+                                        " porém isso não quer dizer que você não seja capaz de aprendê-lo. Continue estudando, sem medo de errar,"+
+                                        " que alguma hora você passa a entender melhor o conteúdo!";
+                                listaExplicacoes.add(explicacaoDesempenho);
+                            }
+                        }
+                    }
+                } else {
+                    if (taxaDeAcertosUltimo > taxaDeAcertosUltimosTres){
+                        if (diffUltimoTeste < 7){
+                            //rank igual ao último, taxa de acertos subindo
+                            //fez questionario nessa semana
+                            explicacaoDesempenho = "Parabéns, você está indo bem nos quizes!"
+                                    +" Seu desempenho no conteúdo "+listaNivelConteudo.get(i).getConteudo().getNomeConteudo()+" apresenta uma significativa evolução e"
+                                    +" comprometimento com o aprendizado. "
+                                    +" Continue estudando e praticando!";
+                            listaExplicacoes.add(explicacaoDesempenho);
+                        } else {
+                            //rank igual ao último, taxa de acertos subindo
+                            //fez questionario há mais de uma semana
+                            explicacaoDesempenho = "A sua taxa de acertos indica que você" +
+                                    " apresenta evolução nos conhecimentos."+
+                                    " Porém, o estudo precisa de prática constante para não se esquecer dos conteúdos e você" +
+                                    " não realizou nem um teste essa semana. Isso pode ser bom, pausas são importantes, mas não deixe de praticar, você está indo bem!";
+                            listaExplicacoes.add(explicacaoDesempenho);
+                        }
+                    } else {
+                        if (diffUltimoTeste < 7){
+                            //rank igual ao último, taxa de acertos igual ou decaindo
+                            //fez questionario nessa semana
+                            explicacaoDesempenho = "De acordo com sua taxa de acertos," +
+                                    " você encontrou uma certa dificuldade no aprendizado." +
+                                    " Estude um pouco mais e continue praticando. Você consegue!";
+                            listaExplicacoes.add(explicacaoDesempenho);
+                        } else {
+                            //rank igual ao último, taxa de acertos igual ou decaindo
+                            //fez questionario há mais de uma semana
+                            explicacaoDesempenho = "Você não pratica há mais de uma semana e apresenta certa dificuldade no conteúdo."+
+                                    " Para o conhecimento se consolidar, é necessário a prática. Volte a praticar para fixar o conteúdo, você consegue!";
+                            listaExplicacoes.add(explicacaoDesempenho);
+                        }
+                    }
+                }
+            } else {
+                listaExplicacoes.add("Realize mais questionários para descobrir mais sobre seu desempenho!");
+            }
         }
-        return
+        return listaExplicacoes;
     }
 
     public ArrayList<NivelConteudo> carregaListaDeNivelConteudoComConteudo(ArrayList<Conteudo> listaConteudos, Usuario usuario){
         return new NivelConteudoDB(context).buscaConteudosComNivel(listaConteudos, usuario);
+    }
+
+    public DesempenhoConteudo getDesempenhoConteudoComId(int id){
+        return new DesempenhoConteudoDB(context).buscaDesempenhoConteudoComId(id);
+    }
+
+    public String[] insereConteudoComNivelConteudoInicial(Conteudo conteudo, Usuario usuario){
+        String[] retorno = new String[2];
+
+        ConteudoDB conteudoDB = new ConteudoDB(context);
+        NivelConteudoDB nivelConteudoDB = new NivelConteudoDB(context);
+        String resultadoInsereConteudo = conteudoDB.insereConteudo(conteudo);
+        String resultadoInsereNivelConteudo;
+        Date dataAtualizacaoNivel = null;
+        Date dataUltimoTeste = null;
+        try {
+            dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+            dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+        } catch(ParseException parse) {
+            parse.printStackTrace();
+        }
+
+        NivelConteudo nivelConteudoNovo = new NivelConteudo(NivelConteudoEnum.COBRE, -1, dataUltimoTeste, dataAtualizacaoNivel, null, usuario, conteudo, 0, 5);
+        resultadoInsereNivelConteudo = nivelConteudoDB.insereNivel(nivelConteudoNovo);
+        retorno[0] = resultadoInsereConteudo;
+        retorno[1] = resultadoInsereNivelConteudo;
+        return retorno;
+
+    }
+
+    public void ligaNivelConteudoComDesempenhoConteudo(DesempenhoQuestionario desempenhoQuestionario, ArrayList<NivelConteudo> listaNivelConteudo){
+        NivelConteudoDB nivelConteudoDB = new NivelConteudoDB(context);
+        nivelConteudoDB.atualizaDesempenhoConteudo(listaNivelConteudo, desempenhoQuestionario);
     }
 }
