@@ -82,6 +82,23 @@ public class ConteudoDB {
         return listaConteudos;
     }
 
+    public Conteudo buscaUltimoConteudo(int tipoConteudo){
+        this.bancoDados = conexao.getWritableDatabase();
+        Conteudo conteudo = null;
+        Cursor cursor = this.bancoDados.rawQuery("SELECT * FROM "+Conexao.getTabelaConteudo()
+                                                    +" WHERE "+Conexao.getTipoConteudo()+" = ?"
+                                                    +" ORDER BY "+Conexao.getIdConteudo()+" DESC"
+                                                    +" LIMIT 1",new String[]{String.valueOf(tipoConteudo)}, null);
+        if (cursor.moveToFirst()){
+            //método construtor 2 (id, nome e tipo)
+            //    public Conteudo(int idConteudo, String nomeConteudo, int tipoConteudo) {
+            conteudo = new Conteudo(cursor.getInt(cursor.getColumnIndex(Conexao.getIdConteudo())),
+                    cursor.getString(cursor.getColumnIndex(Conexao.getNomeConteudo())),
+                    tipoConteudo);
+        }
+        return conteudo;
+    }
+
 
     public ArrayList<Conteudo> buscaConteudosAleatorios(int quantidade, int tipoConteudo) {
         ArrayList<Conteudo> listaConteudos = new ArrayList<>();

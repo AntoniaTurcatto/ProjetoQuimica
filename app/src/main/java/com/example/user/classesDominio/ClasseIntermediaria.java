@@ -543,7 +543,7 @@ public class ClasseIntermediaria {
         return desempenhoQuestionario;
     }
 
-    public ArrayList<String> criaVariasExplicacoesFeedback(Usuario usuario, ArrayList<Conteudo> listaConteudos){
+    public ArrayList<String> criaVariasExplicacoesFeedback(Usuario usuario, ArrayList<NivelConteudo> listaNivelConteudo){
         //LOGICA DA EXPLICAÇÃO:======================================================================================
         //coisas necessárias:
         /*
@@ -562,8 +562,6 @@ public class ClasseIntermediaria {
 
         Date dataHoje = new Date(System.currentTimeMillis());
 
-        ArrayList<NivelConteudo> listaNivelConteudo = nivelConteudoDB.buscaConteudosComNivel(listaConteudos, usuario);
-
         for (int i = 0; i < listaNivelConteudo.size(); i++){
             String explicacaoDesempenho;
             NivelConteudoEnum rankingAtual; //FEITO
@@ -579,27 +577,67 @@ public class ClasseIntermediaria {
             rankingAtual = listaNivelConteudo.get(i).getNivel();
             rankingAnterior = listaNivelConteudo.get(i).getNivelAnterior();
             if (ultimoDesempenhoConteudo != null){
-                taxaDeAcertosUltimosTres = ultimoDesempenhoConteudo.getMediaAcertosUltimosQuestionarios();
-                taxaDeAcertosUltimo = ultimoDesempenhoConteudo.getQuantidadeAcertos()/ultimoDesempenhoConteudo.getQuantidadePerguntas();
+                ArrayList<DesempenhoConteudo> ultimos3DesempenhoConteudo = desempenhoConteudoDB.buscaUltimos3DesempenhosConteudosComConteudo(listaNivelConteudo.get(i).getIdNivelConteudo());
+
+                if (ultimos3DesempenhoConteudo.get(0).getQuantidadePerguntas()>0
+                    && ultimos3DesempenhoConteudo.get(1).getQuantidadePerguntas()>0
+                    && ultimos3DesempenhoConteudo.get(2).getQuantidadePerguntas()>0){
+
+                    taxaDeAcertosUltimo = ultimoDesempenhoConteudo.getQuantidadeAcertos()/ultimoDesempenhoConteudo.getQuantidadePerguntas();
+
+                    taxaDeAcertosUltimosTres = (ultimoDesempenhoConteudo.getQuantidadeAcertos()
+                            +ultimos3DesempenhoConteudo.get(1).getQuantidadeAcertos()
+                            +ultimos3DesempenhoConteudo.get(2).getQuantidadeAcertos())
+                            /(ultimoDesempenhoConteudo.getQuantidadePerguntas()
+                            +ultimos3DesempenhoConteudo.get(1).getQuantidadePerguntas()
+                            +ultimos3DesempenhoConteudo.get(2).getQuantidadePerguntas());
+
+                } else {
+                    taxaDeAcertosUltimo = 0.0f;
+                    taxaDeAcertosUltimosTres = 0.0f;
+                }
+
+                if (ultimoDesempenhoConteudo.getQuantidadePerguntas()>0){
+
+                } else {
+
+                }
+
                 dataUltimoTeste = listaNivelConteudo.get(i).getDataUltimoTeste();
                 dataUltimaAtualizacaoNivel = listaNivelConteudo.get(i).getDataAtualizacaoNivel();
-
+                long diffUltimoTeste;
+                long diffUltimaAtualizacaoNivel;
                 //tempo entre o último teste e o dia atual
-                long diffInMilliesDesdeUltimoTeste = Math.abs(dataUltimoTeste.getTime() - dataHoje.getTime());
-                long diffUltimoTeste = TimeUnit.DAYS.convert(diffInMilliesDesdeUltimoTeste, TimeUnit.MILLISECONDS);
+                //com tratamento de possíveis nulos
+                if (dataUltimoTeste != null){
+                    long diffInMilliesDesdeUltimoTeste = Math.abs(dataUltimoTeste.getTime() - dataHoje.getTime());
+                    diffUltimoTeste = TimeUnit.DAYS.convert(diffInMilliesDesdeUltimoTeste, TimeUnit.MILLISECONDS);
+                    Log.d("dataUltimoTeste", dataUltimoTeste.toString());
+                } else{
+                    diffUltimoTeste = 365L;
+                    Log.d("dataUltimoTeste", "null");
+                }
 
-                long diffInMilliesDesdeUltimaAtualizacaoNivel = Math.abs(dataUltimoTeste.getTime() - dataHoje.getTime());
-                long diffUltimaAtualizacaoNivel = TimeUnit.DAYS.convert(diffInMilliesDesdeUltimaAtualizacaoNivel, TimeUnit.MILLISECONDS);
+                if (dataUltimaAtualizacaoNivel != null){
+                    long diffInMilliesDesdeUltimaAtualizacaoNivel = Math.abs(dataUltimoTeste.getTime() - dataHoje.getTime());
+                    diffUltimaAtualizacaoNivel = TimeUnit.DAYS.convert(diffInMilliesDesdeUltimaAtualizacaoNivel, TimeUnit.MILLISECONDS);
+
+                    Log.d("dataUltimoMudaRank", dataUltimaAtualizacaoNivel.toString());
+                } else {
+                    diffUltimaAtualizacaoNivel = 365L;
+
+                    Log.d("dataUltimoMudaRank", "null");
+                }
+
 
                 Log.d("dataHoje", dataHoje.toString());
-                Log.d("dataUltimoTeste", dataUltimoTeste.toString());
-                Log.d("dataUltimoMudaRank", dataUltimaAtualizacaoNivel.toString());
+
 
                 Log.d("Dias desde o ultimoTest", String.valueOf(diffUltimoTeste));
                 Log.d("DiasDesdeUltimaMudaRank", String.valueOf(diffUltimaAtualizacaoNivel));
                 if (rankingAtual.getValor() > rankingAnterior.getValor()){ // IF FINALIZADO
                     if (rankingAtual.getValor() - 2 == rankingAnterior.getValor()){//avançou 2 níveis (diagnóstico)
-                        if (taxaDeAcertosUltimo > taxaDeAcertosUltimosTres){
+                        if (taxaDeAcertosUltimo >= taxaDeAcertosUltimosTres){
                             if (diffUltimoTeste < 7){
                                 if (diffUltimaAtualizacaoNivel<7){
                                     //rank melhor que último, taxa de acertos subindo
@@ -680,7 +718,7 @@ public class ClasseIntermediaria {
                             }
                         }
                     } else {//avançou 1 níveis (questionário)
-                        if (taxaDeAcertosUltimo > taxaDeAcertosUltimosTres){
+                        if (taxaDeAcertosUltimo >= taxaDeAcertosUltimosTres){
                             if (diffUltimoTeste < 7){
                                 if (diffUltimaAtualizacaoNivel<7){
                                     //rank melhor que último, taxa de acertos subindo
@@ -763,7 +801,7 @@ public class ClasseIntermediaria {
                     }
 
                 } else if (rankingAtual.getValor() < rankingAnterior.getValor()){
-                    if (taxaDeAcertosUltimo > taxaDeAcertosUltimosTres){
+                    if (taxaDeAcertosUltimo >= taxaDeAcertosUltimosTres){
                         if (diffUltimoTeste < 7){
                             if (diffUltimaAtualizacaoNivel<7){
                                 //rank menor que último, taxa de acertos subindo
@@ -841,7 +879,7 @@ public class ClasseIntermediaria {
                         }
                     }
                 } else {
-                    if (taxaDeAcertosUltimo > taxaDeAcertosUltimosTres){
+                    if (taxaDeAcertosUltimo >= taxaDeAcertosUltimosTres){
                         if (diffUltimoTeste < 7){
                             //rank igual ao último, taxa de acertos subindo
                             //fez questionario nessa semana
@@ -868,11 +906,15 @@ public class ClasseIntermediaria {
                                     " Estude um pouco mais e continue praticando. Você consegue!";
                             listaExplicacoes.add(explicacaoDesempenho);
                         } else {
-                            //rank igual ao último, taxa de acertos igual ou decaindo
-                            //fez questionario há mais de uma semana
-                            explicacaoDesempenho = "Você não pratica há mais de uma semana e apresenta certa dificuldade no conteúdo."+
-                                    " Para o conhecimento se consolidar, é necessário a prática. Volte a praticar para fixar o conteúdo, você consegue!";
-                            listaExplicacoes.add(explicacaoDesempenho);
+                            if (taxaDeAcertosUltimosTres == 0.0f){
+                                listaExplicacoes.add("Realize mais questionários para descobrir mais sobre seu desempenho!");
+                            } else {
+                                //rank igual ao último, taxa de acertos igual ou decaindo
+                                //fez questionario há mais de uma semana
+                                explicacaoDesempenho = "Você não pratica há mais de uma semana e apresenta certa dificuldade no conteúdo."+
+                                        " Para o conhecimento se consolidar, é necessário a prática. Volte a praticar para fixar o conteúdo, você consegue!";
+                                listaExplicacoes.add(explicacaoDesempenho);
+                            }
                         }
                     }
                 }
@@ -891,21 +933,23 @@ public class ClasseIntermediaria {
         return new DesempenhoConteudoDB(context).buscaDesempenhoConteudoComId(id);
     }
 
-    public String[] insereConteudoComNivelConteudoInicial(Conteudo conteudo, Usuario usuario){
+    public String[] insereConteudoComNivelConteudoInicial(Conteudo conteudo, Usuario usuario, int tipoConteudo){
         String[] retorno = new String[2];
 
         ConteudoDB conteudoDB = new ConteudoDB(context);
         NivelConteudoDB nivelConteudoDB = new NivelConteudoDB(context);
         String resultadoInsereConteudo = conteudoDB.insereConteudo(conteudo);
+        conteudo.setIdConteudo(conteudoDB.buscaUltimoConteudo(tipoConteudo).getIdConteudo());
         String resultadoInsereNivelConteudo;
         Date dataAtualizacaoNivel = null;
         Date dataUltimoTeste = null;
         try {
-            dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
-            dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+            dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
+            dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
         } catch(ParseException parse) {
             parse.printStackTrace();
         }
+
 
         NivelConteudo nivelConteudoNovo = new NivelConteudo(NivelConteudoEnum.COBRE, -1, dataUltimoTeste, dataAtualizacaoNivel, null, usuario, conteudo, 0, 5);
         resultadoInsereNivelConteudo = nivelConteudoDB.insereNivel(nivelConteudoNovo);

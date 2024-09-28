@@ -43,7 +43,7 @@ public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackAdapter.MyView
         //PARÂMETROS:
         //      Usuario usuario, List<NivelConteudo> listaNivelConteudo
         listaNivelConteudo = classeIntermediaria.carregaListaDeNivelConteudoComConteudo(listaConteudos, usuario);
-        listaExplicacoes = classeIntermediaria.criaVariasExplicacoesFeedback(usuario, listaConteudos);
+        listaExplicacoes = classeIntermediaria.criaVariasExplicacoesFeedback(usuario, (ArrayList<NivelConteudo>)listaNivelConteudo);
     }
 
     @Override

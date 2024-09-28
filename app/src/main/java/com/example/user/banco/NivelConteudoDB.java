@@ -14,6 +14,7 @@ import com.example.user.classesDominio.NivelConteudo;
 import com.example.user.classesDominio.Usuario;
 import com.example.user.componente.NivelConteudoEnum;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -86,15 +87,15 @@ public class NivelConteudoDB {
             Date dataUltimoTeste = null;
             try {
                 if (!dataAtualizacaoNivel.equals("")){
-                    dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataStringAtualizacaoNivel);
+                    dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse(dataStringAtualizacaoNivel);
                 } else {
-                    dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+                    dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
                 }
 
                 if (!dataUltimoTeste.equals("")){
-                    dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dataStringUltimoTeste);
+                    dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse(dataStringUltimoTeste);
                 } else {
-                    dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse("01/01/0001 00:00:00");
+                    dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
                 }
 
             } catch(ParseException parse) {
@@ -157,22 +158,24 @@ public class NivelConteudoDB {
                     String dataStringUltimoTeste = cursor.getString(cursor.getColumnIndex(Conexao.getDataUltimoTeste()));
                     String dataStringAtualizacaoNivel = cursor.getString(cursor.getColumnIndex(Conexao.getDataAtualizacaoNivel()));
 
+
                     Date dataAtualizacaoNivel = null;
                     Date dataUltimoTeste = null;
                     try {
-                        if (!dataStringAtualizacaoNivel.equals("")){
-                            dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(dataStringAtualizacaoNivel);
+                        if (!dataStringAtualizacaoNivel.equals("")) {
+                            // Corrigido para reconhecer "GMT-03:00"
+                            dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse(dataStringAtualizacaoNivel);
                         } else {
-                            dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                            dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
                         }
 
-                        if (!dataStringUltimoTeste.equals("")){
-                            dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(dataStringUltimoTeste);
+                        if (!dataStringUltimoTeste.equals("")) {
+                            dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse(dataStringUltimoTeste);
                         } else {
-                            dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                            dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
                         }
 
-                    } catch(ParseException parse) {
+                    } catch (ParseException parse) {
                         parse.printStackTrace();
                     }
 
@@ -237,8 +240,8 @@ public class NivelConteudoDB {
                     Date dataAtualizacaoNivel = null;
                     Date dataUltimoTeste = null;
                     try {
-                        dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
-                        dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                        dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
+                        dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
                     } catch(ParseException parse) {
                         parse.printStackTrace();
                     }
@@ -427,15 +430,15 @@ public class NivelConteudoDB {
             Date dataUltimoTeste = null;
             try {
                 if (!dataAtualizacaoNivel.equals("")){
-                    dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(dataStringAtualizacaoNivel);
+                    dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse(dataStringAtualizacaoNivel);
                 } else {
-                    dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                    dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
                 }
 
                 if (!dataUltimoTeste.equals("")){
-                    dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse(dataStringUltimoTeste);
+                    dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse(dataStringUltimoTeste);
                 } else {
-                    dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                    dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
                 }
 
             } catch(ParseException parse) {
@@ -473,8 +476,8 @@ public class NivelConteudoDB {
             Date dataAtualizacaoNivel = null;
             Date dataUltimoTeste = null;
             try {
-                dataAtualizacaoNivel = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
-                dataUltimoTeste = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy").parse("01/01/0001 00:00:00");
+                dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
+                dataUltimoTeste = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
             } catch(ParseException parse) {
                 parse.printStackTrace();
             }
@@ -497,8 +500,8 @@ public class NivelConteudoDB {
             Log.d("Teste", "Entrei no if de incrementaNivel em NivelConteudoDB!");
             valores.put(Conexao.getNIVEL(), meuNivelConteudo.getNivel().getValor());
             valores.put(Conexao.getSubiuOuDesceuNivel(), 1);
-            valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
-            valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
+            valores.put(Conexao.getDataAtualizacaoNivel(), new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").format(new Date(System.currentTimeMillis())));
+            valores.put(Conexao.getDataUltimoTeste(),new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").format(new Date(System.currentTimeMillis())));
             //update em NivelConteudo
             long retorno = this.bancoDados.update(Conexao.getTabelaNivelConteudo(), valores, where, null);
         } else {
@@ -507,8 +510,14 @@ public class NivelConteudoDB {
             valores.put(Conexao.getNIVEL(), meuNivelConteudo.getNivel().getValor());
             valores.put(Conexao.getFkUsuarioNivel(), meuUsuario.getIdUsuario());
             valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
-            valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
-            valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
+            Date dataAtualizacaoNivel = null;
+            try {
+                dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
+            } catch(ParseException parse) {
+                parse.printStackTrace();
+            }
+            valores.put(Conexao.getDataAtualizacaoNivel(), new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").format(dataAtualizacaoNivel));
+            valores.put(Conexao.getDataUltimoTeste(), new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").format(new Date(System.currentTimeMillis())));
             //insert em NivelConteudo, não update
             long retorno = this.bancoDados.insert(Conexao.getTabelaNivelConteudo(), null, valores);
             if (retorno >= 0) {
@@ -540,8 +549,8 @@ public class NivelConteudoDB {
             Log.d("Teste", "Entrei no if de decaiNivel em NivelConteudoDB!");
             valores.put(Conexao.getNIVEL(), meuNivelConteudo.getNivel().getValor());
             valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
-            valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
-            valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
+            valores.put(Conexao.getDataAtualizacaoNivel(), new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").format(new Date(System.currentTimeMillis())));
+            valores.put(Conexao.getDataUltimoTeste(),new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").format(new Date(System.currentTimeMillis())));
             //update em NivelConteudo
             long retorno = this.bancoDados.update(Conexao.getTabelaNivelConteudo(), valores, where, null);
         } else {
@@ -550,8 +559,14 @@ public class NivelConteudoDB {
             valores.put(Conexao.getNIVEL(), meuNivelConteudo.getNivel().getValor());
             valores.put(Conexao.getFkUsuarioNivel(), meuUsuario.getIdUsuario());
             valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
-            valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
-            valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
+            Date dataAtualizacaoNivel = null;
+            try {
+                dataAtualizacaoNivel = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").parse("01/01/1971 00:00:000 GMT-03:00");
+            } catch(ParseException parse) {
+                parse.printStackTrace();
+            }
+            valores.put(Conexao.getDataAtualizacaoNivel(), new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").format(dataAtualizacaoNivel));
+            valores.put(Conexao.getDataUltimoTeste(), new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").format(new Date(System.currentTimeMillis())));
             //insert em NivelConteudo, não update
             long retorno = this.bancoDados.insert(Conexao.getTabelaNivelConteudo(), null, valores);
             if (retorno >= 0) {
@@ -629,8 +644,9 @@ public class NivelConteudoDB {
         valores.put(Conexao.getFkConteudoNivel(), meuNivelConteudo.getConteudo().getIdConteudo());
         valores.put(Conexao.getFkUsuarioNivel(), meuNivelConteudo.getUsuario().getIdUsuario());
         valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
-        valores.put(Conexao.getDataUltimoTeste(), meuNivelConteudo.getDataUltimoTeste().toString());
-        valores.put(Conexao.getDataAtualizacaoNivel(), meuNivelConteudo.getDataAtualizacaoNivel().toString());
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz");
+        valores.put(Conexao.getDataUltimoTeste(), df.format(meuNivelConteudo.getDataUltimoTeste()));
+        valores.put(Conexao.getDataAtualizacaoNivel(), df.format(meuNivelConteudo.getDataAtualizacaoNivel()));
 
         resultado = this.bancoDados.insert(Conexao.getTabelaNivelConteudo(), null, valores);
         this.bancoDados.close();
@@ -682,7 +698,7 @@ public class NivelConteudoDB {
             valores.put(Conexao.getFkUsuarioNivel(), meuUsuario.getIdUsuario());
             valores.put(Conexao.getSubiuOuDesceuNivel(), -1);
             valores.put(Conexao.getDataUltimoTeste(), new Date(System.currentTimeMillis()).toString());
-            valores.put(Conexao.getDataAtualizacaoNivel(), "Sat Jan 01 00:00:00 GMT+00:00 1");
+            valores.put(Conexao.getDataAtualizacaoNivel(), "01/01/1971 00:00:000 GMT-03:00");
             //EEE MMM dd HH:mm:ss zzz yyyy
             //insert em NivelConteudo, não update
             long retorno = this.bancoDados.insert(Conexao.getTabelaNivelConteudo(), null, valores);
@@ -741,7 +757,7 @@ public class NivelConteudoDB {
         if (nivelConteudo.getIdNivelConteudo() != -1){
             where = Conexao.getIdNivelConteudo()+" = "+nivelConteudo.getIdNivelConteudo()+" AND "+Conexao.getFkUsuarioNivel()+" = "+usuario.getIdUsuario();
             //  dd/MM/yyyy HH:mm:ss
-            valores.put(Conexao.getDataUltimoTeste(),new Date(System.currentTimeMillis()).toString());
+            valores.put(Conexao.getDataUltimoTeste(),new SimpleDateFormat("dd/MM/yyyy HH:mm:ss zzz").format(new Date(System.currentTimeMillis())));
             //Update em NivelConteudoDB
             long retorno = bancoDados.update(Conexao.getTabelaNivelConteudo(), valores, where, null);
             if (retorno == -1){

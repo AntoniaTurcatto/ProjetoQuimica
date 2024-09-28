@@ -58,7 +58,7 @@ public class EntradaDeConteudosActivity extends AppCompatActivity{
                     Conteudo meuConteudo = new Conteudo(nomeConteudo, informacoesApp.getTipoConteudo());
                     Log.d("Teste", "Tipo do conteudo: " + informacoesApp.getTipoConteudo());
 
-                    String[] retornoConteudo = classeIntermediaria.insereConteudoComNivelConteudoInicial(meuConteudo, informacoesApp.getMeuUsuario());
+                    String[] retornoConteudo = classeIntermediaria.insereConteudoComNivelConteudoInicial(meuConteudo, informacoesApp.getMeuUsuario(), informacoesApp.getTipoConteudo());
                     limpaCampos();
                     Toast.makeText(EntradaDeConteudosActivity.this, retornoConteudo[0], Toast.LENGTH_SHORT).show();
                     Toast.makeText(EntradaDeConteudosActivity.this, retornoConteudo[1], Toast.LENGTH_SHORT).show();
